@@ -15,14 +15,32 @@ const GroupFunc = () => {
     )
 }
 
+const createOnHover = () => {
+    const hover = document.getElementById("hovercreate");
+    hover.style.display = "inline";
+
+}
+
+const createOnOut = () => {
+    const hover = document.getElementById("hovercreate");
+    hover.style.display = "none";
+
+}
+
+
+
 const Followed = () => {
     return (
         <div className="h-[80vh] grid">
-            <button className=" shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4 w-auto text-white rounded-full cursor-pointer self-center">Create</button>
-            <div className=" flex flex-rol gap-2 m-2">
-            <button className=" shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4 w-auto text-white rounded-full cursor-pointer self-center">Donate Post</button>
-            <button className=" shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4 w-auto text-white rounded-full cursor-pointer self-center">Post</button>
-
+            <div className=" w-full" onClick={createOnHover} onMouseOver={createOnHover} onMouseOut={createOnOut}>
+                <button className={`w-full shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4 text-white rounded-full 
+                cursor-pointer self-center `}  >Create</button>
+                <div className=" hidden" id="hovercreate">
+                    <div className="  flex flex-col gap-2 m-2">
+                        <button className=" shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4 w-auto text-white rounded-full cursor-pointer self-center"
+                        >Donate Post</button>
+                    </div>
+                </div>
             </div>
             <p className="mt-4 mb-1">Groups</p>
             <div className={`overflow-y-scroll h-[100%] ${myScrollBar}`}>

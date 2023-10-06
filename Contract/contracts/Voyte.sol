@@ -1,4 +1,4 @@
-+//SPDX-License-Identifier: GPL-3.0
+//SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
 abstract contract Context {
@@ -79,7 +79,7 @@ contract Voyte is Owner{
         bool exist;
         address user;
         string password;
-        uint16 resetCode;
+        uint256 resetCode;
     }
     
     uint256 userCounter = 0;
@@ -90,8 +90,8 @@ contract Voyte is Owner{
     
     // creats a user 
     event CreateUser (User user, uint time); 
-    function creatUser(address userm, string memory passwordm) public returns (bool success ){
-        User memory user = User(true,userm,passwordm,0);
+    function creatUser(address userm, string memory passwordm,uint256 passkey) public returns (bool success ){
+        User memory user = User(true,userm,passwordm,passkey);
         users[userm] = user;
         userCounter++;
         
@@ -184,7 +184,7 @@ contract Voyte is Owner{
         address mAddress;
         UserName userName;
         Contact Contact;
-        bytes32 bio;
+        string bio;
         bytes32 country;
         bytes32 profileImg;
         bytes32 coverImg;
@@ -195,7 +195,7 @@ contract Voyte is Owner{
 
     uint256 public profileCounter = 0;
     mapping (address => Profile ) profiles;
-    mapping (uint256 => address) profilesIndex;
+    mapping (uint256 => address) profileAddress;
 
     /**
     *   Add a new profile
@@ -203,7 +203,7 @@ contract Voyte is Owner{
      */
     event CreateProfile(address indexed user,uint256 timestamp);
 
-    function createProfile(address _user, UserName memory _username, Contact memory _contact,bytes32 _bio,bytes32 _country, 
+    function createProfile(address _user, UserName memory _username, Contact memory _contact,string memory _bio,bytes32 _country, 
                              bytes32 _profileImg, bytes32  _coverImg, bytes32  _profileType) hasNoProfile(_user) accountCreated(_user)  public returns (bool success){
 
         
@@ -211,7 +211,7 @@ contract Voyte is Owner{
         
         Profile memory profile = Profile(true,_user,_username,_contact,_bio,_country,_profileImg,_coverImg,_profileType,false);
         profiles[_user] = profile;
-        profilesIndex[profileCounter] = _user;
+        profileAddress[profileCounter] = _user;
 
         emit CreateProfile(_user,block.timestamp);
 
@@ -219,12 +219,12 @@ contract Voyte is Owner{
 
     }
 
-    function getProfile(address _user) public view returns (Profile memory) {
+    function getProfile(address _user) public view returns (Profile memory userAddress) {
         return profiles[_user];
     }
 
-    function getProfilesTotal() public view returns (uint256 postNum){
-        return profileCounter;
+    function getProfileAddress(uint256 _index) public view returns (address userAddress) {
+        return profileAddress[_index];
     }
 
     /**
@@ -264,12 +264,13 @@ contract Voyte is Owner{
 
     uint256 public postId;
 
-    mapping (address => Post[] ) public groupedPosts;
+    mapping (uint256 => address ) postAddressIndex;
+    mapping (address => Post ) posts;
 
     
 
     /**
-    * Creates a post
+    * Creates a post with affilliation
     */
 
     event NewPost(uint256 postId);
@@ -277,15 +278,17 @@ contract Voyte is Owner{
     function addPost(uint256 _postId, address _user, address _affiliation, uint256 _minAmount, bytes32 _caption, bytes32 _message, bytes32 _mediaUrl) hasProfile(_user) public returns (bool success){
         Post memory post = Post(_postId,_user,_affiliation,_minAmount,_caption,_message,_mediaUrl,block.timestamp,block.timestamp);
 
-        groupedPosts[_user].push(post);
+        posts[_user] = (post);
+        postAddressIndex[postId] = _user;
 
         emit NewPost(postId++);
 
         return true;
     }
 
-    function getUserPosts(address user) public view returns (Post[] memory) {
-        return groupedPosts[user];
+
+    function getUserPost(address user) public view returns (Post memory) {
+        return posts[user];
     }
 
     /**
@@ -293,10 +296,10 @@ contract Voyte is Owner{
     */
     event DeletePost(uint256 postId);
 
-     function deletePost( address _user,uint256 _postId, uint32 _postIndex) hasProfile(_user) public returns (bool success) {
+     function deletePost( address _user,uint256 _postId) hasProfile(_user) public returns (bool success) {
          
-        if(groupedPosts[_user][_postIndex].postId == _postId){
-            delete groupedPosts[_user][_postIndex];
+        if(posts[_user].postId == _postId){
+            delete posts[_user];
             emit DeletePost(_postId);
             return true;
         }
