@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap");
+
+
+* html {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: "Open Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .scrollba::-webkit-scrollbar-track {
+    background: red;
+    background-color: blue;
+  }
+
+  .background-gradient {
+    background-color: #f8ceec;
+    background-image: linear-gradient(315deg, #f8ceec 0%, #a88beb 74%);
+  }
+  
+
+
+  /*
+  *
+  */
+  input[type="search" i]::-webkit-search-cancel-button {
+    margin-right: 3px;
+    margin-left: 8px;
+    font-size: 1.5rem;
+}
+
+::-webkit-input-placeholder{
+  color: #fff;
+  background-color: #fff;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  .font-outline-2 {
+    -webkit-text-stroke: 2px "#701A75";
+  }
+  .font-outline-4 {
+    -webkit-text-stroke: 4px '#701A75';
+  }
+}
