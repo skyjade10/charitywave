@@ -134,10 +134,10 @@ const PostDetailCard = ({data}) => {
              const amount = items.amount;
 
             return <div className=" flex flex-row justify-center gap-4 items-center py-1">
-                        <div className=" w-10 h-10 ">
+                        {/* <div className=" w-10 h-10 ">
                             <img className=" w-full h-full border-2 border-gray-500 rounded-full" src={media} alt="" />
                         </div>
-                        <p>{`${name} donated ${amount} Trx`}</p>
+                        <p>{`${name} donated ${amount} Trx`}</p> */}
                     </div>
         }
 
@@ -155,10 +155,10 @@ const PostDetailCard = ({data}) => {
              const amount = items.amount;
 
             return <div className=" flex flex-row justify-center gap-4 items-center py-1">
-                        <div className=" w-10 h-10 ">
+                        {/* <div className=" w-10 h-10 ">
                             <img className=" w-full h-full border-2 border-gray-500 rounded-full" src={media} alt="" />
                         </div>
-                        <p>{`${name} donations ${amount} Trx`}</p>
+                        <p>{`${name} donations ${amount} Trx`}</p> */}
                     </div>
         }
 

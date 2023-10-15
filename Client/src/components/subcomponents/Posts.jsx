@@ -8,11 +8,12 @@ import { ClientContext } from '../context/ClientContext';
 import {MdVerified, MdMenu,MdOutlineDiversity3,MdLocationPin, MdLocationOn,MdMan4,MdLocationCity,MdGroups2} from "react-icons/md";
 
 import { contractAddress , contractAbi } from '../context/constants';
-import { urlpath } from '../../utils';
+import { urlpath, ecodeAddress } from '../../utils';
 
 import { storage } from '../../firebase';
 import { ref, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const PostCardView = ({data}) => {
 
@@ -153,6 +154,13 @@ const PostCardView = ({data}) => {
         return null
     }
 
+
+    const profileOnclick = async (e) => {
+        e.preventDefault();
+        navigate(`/${ecodeAddress((window.tronWeb.address.toHex(mData.affiliation)))}`, { state: window.tronWeb.address.toHex(mData.affiliation) });
+        
+    }
+
     
     const { setTransactModalOpen,setTransactionData } = useContext(ClientContext)
     const donate = (mpostID,mname,maddress) => {
@@ -208,7 +216,13 @@ const PostCardView = ({data}) => {
                     <div className=' flex flex-row  text-xs md:text-xs gap-2 text-gray-500'>
                         {proOrg()}
                         {proLocation()}
-                        {proAffiliation()}
+                        <Link to={"/profile" } state={mData.mAddress}>
+                            <div onClick={
+                                (e) => { e.stopPropagation()
+                                    profileOnclick(e)
+                                }
+                            }>{proAffiliation()}</div>
+                        </Link>
                     </div>
                     
                 </div>

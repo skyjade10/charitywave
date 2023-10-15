@@ -4,7 +4,7 @@ import user from "../assets/images/cover3.jpg"
 import {MdArrowBack, MdVerified,MdMenu,MdMyLocation,MdPhone,MdEmail } from "react-icons/md";
 import { CgWebsite } from 'react-icons/cg';
 import { useState,useEffect,useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useParams  } from "react-router-dom";
 import {  } from "react";
 
@@ -337,6 +337,8 @@ const Profile = () => {
                 console.log("my data", mmData);
                
             } catch (error) {
+                alert('something went wrong')
+                Navigate('/post')
                 console.log(error);
             }
             

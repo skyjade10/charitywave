@@ -28,8 +28,8 @@ const MenuItems = ({icon,title,menuOnClick}) => {
 
 const NavBar = () => {
 
-    const { tronLinkConnected,tronLinkIsConnected,currentAccount,connectWallet,isLoggedIn,getVoyteContract,voyteUser } = useContext(BackendContext);
-    const { setSignInModalIsOpen } = useContext(ClientContext);
+    const { tronLinkConnected,tronLinkIsConnected,currentAccount,connectWallet,isLoggedIn,setIsLogged,getVoyteContract,voyteUser,setVoyteUser } = useContext(BackendContext);
+    const { setSignInModalIsOpen,setSignUpModalIsOpen } = useContext(ClientContext);
     const [ searchToggle,setSearchToggle ] = useState(false);
     const [ menuToggle,setMenuToggle ] = useState(false);
     const [ walletConnected,setWalletConnected] = useState(false);
@@ -90,6 +90,8 @@ const NavBar = () => {
 
     const signOut = () => {
         try {
+            setIsLogged(false)
+            setVoyteUser(null)
             localStorage.removeItem(VOYTE_USER);
             localStorage.removeItem(CURRENT_ACCOUNT);
             localStorage.removeItem(isLoggedIn);
@@ -109,7 +111,31 @@ const NavBar = () => {
                 //navigate('/login');
                 setSignInModalIsOpen(true);
                 setMenuToggle(false)
-                console.log("navigating to login");
+             
+           }
+           
+        }else{
+
+            if(connectWallet()){
+                setSignInModalIsOpen(true);
+                setMenuToggle(false);
+                return
+            }else{
+                setMenuToggle(false)
+                return alert("TronLink not connected");
+            }
+
+            
+        }
+    }
+    const SignUpclick = async (e) => {
+        e.preventDefault();
+        
+        if(tronLinkConnected){
+           if(currentAccount.base58 != null || currentAccount.base58 != ''){
+             
+                setSignUpModalIsOpen(true);
+                setMenuToggle(false)
              
            }
            
@@ -156,8 +182,8 @@ const NavBar = () => {
             <ul className='flex gap-4 items-center'>
                 <li className={` ${iconClass}  `} onClick={()=>{
                     searchToggle?setSearchToggle(false): setSearchToggle(true)
-                }}>{<CgSearch style={iconsStyle}/>}</li>
-                <Link to={"/profile"}><li className={` ${iconClass}`}>{<CgProfile style={iconsStyle}/>}</li></Link>
+                }}>{/*<CgSearch style={iconsStyle}/>*/}</li>
+                <li className={` ${iconClass}`}>{<CgProfile style={iconsStyle} onClick={profileOnclick}/>}</li>
                 <li onClick={()=>{
                     menuToggle?setMenuToggle(false):setMenuToggle(true)
                     }} className={` ${iconClass}`}>{<MdMenu style={iconsStyle}/>}</li>
@@ -169,7 +195,7 @@ const NavBar = () => {
                     
                     {!walletConnected &&(
                         <div>
-                            <button className=' border-2 border-white rounded-s-full rounded-e-full
+                            <button className=' border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={connectWalletOnclick}>Connect Wallet</button>
                         
                         </div>
@@ -177,7 +203,14 @@ const NavBar = () => {
 
                     {!isLoggedIn &&(
                         <div>
-                            <button className=' border-2 border-white rounded-s-full rounded-e-full
+                            <button className=' border-2 border-blue-600 rounded-s-full rounded-e-full
+                            px-4 py-1 mb-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={SignUpclick}>Sign Up</button>
+                        
+                        </div>
+                    )}
+                    {!isLoggedIn &&(
+                        <div>
+                            <button className=' border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 mb-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={SignInclick}>Login</button>
                         
                         </div>
@@ -192,10 +225,10 @@ const NavBar = () => {
                     {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="FAQ" menuOnClick={()=> navigate('/faq')}/>}
                     {<MenuItems icon={<MdInfoOutline style={menuIconsStyle}/>} title="About" menuOnClick={()=> navigate('/about')}/>}
                     
-                    {walletConnected && (
+                    {isLoggedIn && (
                         <div>
                             <hr className=' border-gray-400'/>
-                            <button className={` bg-[${theme.purple}] border-2 border-[#7A306C] rounded-s-full rounded-e-full
+                            <button className={` bg-[${theme.purple}] border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300`} onClick={signOut}>Sign Out</button>
                         </div>
                     )}
