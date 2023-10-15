@@ -1,43 +1,29 @@
 
-import car from '../../assets/images/used.jpg';
-import React, { useContext, useState, useEffect } from 'react';
+import car from '../../assets/images/cover3.jpg';
+import React, { useContext,useRef, useState, useEffect } from 'react';
 import { BackendContext } from '../context/BackendContext';
+import { ClientContext } from '../context/ClientContext';
+
 
 import {MdVerified, MdMenu,MdOutlineDiversity3,MdLocationPin, MdLocationOn,MdMan4,MdLocationCity,MdGroups2} from "react-icons/md";
-import {HiUserGroup} from "react-icons/hi";
-import {CgOrganisation} from "react-icons/cg";
 
 import { contractAddress , contractAbi } from '../context/constants';
+import { urlpath } from '../../utils';
 
-const PostCardView = (data) => {
+import { storage } from '../../firebase';
+import { ref, getDownloadURL } from 'firebase/storage';
+import { useNavigate } from 'react-router';
+
+const PostCardView = ({data}) => {
+
+    
 
 
-    // var mData = {
-    //                 postId:"12900",
-    //                 mAddress:"wdfdhfjdhfjhdf",
-    //                 affiliation:" World health Org",
-    //                 minAmount:"100 trx",
-    //                 caption:"School fees",
-    //                 message: "Lorem ipsum dolor sit amet consectetur, adipisicing elit. A aperiam asperiores repellendus, expedita eos aliquid eveniet itaque. Consequatur exercitationem odit corrupti delectus eveniet. Mollitia nulla soluta ipsam alias, sapiente labore.",
-    //                 mediaUrls: "",
-    //                 dateCreated: "",
-    //                 verified: true,
-    //                 firstName: "Zambwe",
-    //                 lastName: "Nasilele",
-    //                 profileType: "Individual",
-    //                 location: "Kalulushi, Zambia" 
-                
-    //             };
-
-    // if(data!= null){
-    //     mData = data;
-    // }
-
-    //get Id
+    const mData = data;
 
     const getId = () => {
         console.log(mData.postId);
-        return mData.postId;
+        return mData.postId.toNumber();
         //navigate('/profile');
     }
 
@@ -62,6 +48,7 @@ const PostCardView = (data) => {
 
             return <h5 className=" font-semibold">{cap} </h5>
         }
+        return <div></div>
     }
 
     //Setting Message
@@ -70,7 +57,7 @@ const PostCardView = (data) => {
         if(mData.message!=null && mData.message != ""){
             msg = mData.message;
 
-            return <p className=" text-sm text-left text-gray-700">{msg} </p>
+            return <p className="truncate  text-sm text-left text-gray-700">{msg} </p>
         }
     }
 
@@ -87,11 +74,14 @@ const PostCardView = (data) => {
     //Setting image
     const proImage = () => {
         let vr = car;
-        // if(mData.profileImg != null){
-        //     vr = "";
-        //     vr = mData.profileImg;
-        //     return vr;
-        // }
+
+        if(mData != null){
+            if(mData.profileImg!=null && mData.profileImg != ""){
+                vr = mData.profileImg;
+    
+                return vr
+            }
+        }
             
         return vr;
     }
@@ -99,12 +89,16 @@ const PostCardView = (data) => {
     //Setting Media
     const proMedia = () => {
         let vr = proImage();
-        // if(mData.mediaUrls != null && mData.mediaUrls != ""){
-        //     vr = "";
-        //     vr = mData.profileImg;
-        //     return vr;
-        // }
-            
+        if(mData != null){
+
+            if(mData.mediaUrls != null && mData.mediaUrls != ""){
+                vr = "";
+                vr = mData.profileImg;
+                return vr;
+            }
+        }
+         
+
         return vr;
     }
 
@@ -118,13 +112,13 @@ const PostCardView = (data) => {
             org = mData.profileType;
 
             return <div className=" flex text-sm gap-2 items-center">
-                <MdVerified style={minIconStyle}/>
-                <p className="text-sm">{org} </p>
+                <MdGroups2 style={minIconStyle}/>
+                <p className="text-xs">{org} </p>
             </div>
         }
 
         return <div className=" flex text-sm gap-2 items-center">
-                <MdVerified style={minIconStyle}/>
+                <MdGroups2 style={minIconStyle}/>
                 <p className="text-xs">{org} </p>
             </div>
     }
@@ -152,25 +146,35 @@ const PostCardView = (data) => {
 
             return <div className=" flex text-sm gap-2 items-center">
                 <MdOutlineDiversity3 className=" " style={minIconStyle}/>
-                <p className="text-xs cursor-pointer ">Zambia foundation</p>
+                <p className="text-xs cursor-pointer ">{window.tronWeb.address.fromHex(affli)}</p>
             </div>
         }
 
         return null
     }
 
-    const menuStyle = {color:"white", fontSize:"2.0em"}
+    
+    const { setTransactModalOpen,setTransactionData } = useContext(ClientContext)
+    const donate = (mpostID,mname,maddress) => {
+        console.log("Check t=data",mpostID,mname,maddress);
+        setTransactionData((prevState) => ({...prevState,name:mname,address:maddress,postId:mpostID}))
+    }
+
+    const menuStyle = {color:"gray", fontSize:"2.0em"}
+    const navigate = useNavigate();
 
     const cardViewHandleClick = (e) => {
 
         e.preventDefault();
 
+        navigate(`/post/${mData.postIndex}/${mData.postId}`)
+
         console.log("My id", getId());
     }
 
     return (
-        <div className="mb-2 p-2 cursor-pointer border-2 rounded-md shadow-md" name="zana post" key={getId} onClick={(e)=>{cardViewHandleClick(e)}}>
-            <div className="mb-2 flex flex-row justify-between pe-4">
+        <div className=" bg-white mb-2 p-2 cursor-pointer border-2 justify-items-stretch rounded-md shadow-md" name="zana post" key={getId} onClick={(e)=>{cardViewHandleClick(e)}}>
+            <div className="mb-2 flex flex-row justify-between pe-4 w-full ">
                 <div className=' flex flex-row justify-center items-center gap-1 cursor-pointer'>
                     <div className=' w-10  md:me-2 '>
                         <img className=' w-full h-full ' src={proImage()} alt="post-profile-pic" />
@@ -182,15 +186,22 @@ const PostCardView = (data) => {
                     <MdMenu style={menuStyle} />
                 </div>
             </div>
-            <div className=' grid grid-cols-[auto,auto] gap-2 justify-center'>
+            <div className=' grid grid-cols-[auto,auto] justify-start gap-2 w-full'>
             
                 <div className=' w-36 md:me-2'>
                     <img className=' w-full h-full' src={proMedia()} alt="post-profile-pic" />
                 </div>
                 <div className=' grid grid-row[auto]'>
-                    <div className=' flex flex-row items-center justify-between'>
-                        {proCaption()}
-                        <button className=' px-4 py-1 bg-purple-800 text-white rounded-s-full rounded-e-full text-sm'>donate</button>
+                    <div className = " w-full ow-span-full">
+                        <div className='flex flex-row justify-between items-center gap-2' onClick={
+                             (e) => { e.stopPropagation()}
+                        }>
+                            {proCaption()}
+                            <button className=' px-4 py-1 bg-purple-800 text-white  rounded-s-full rounded-e-full text-sm' onClick={() => {
+                                setTransactModalOpen(true); 
+                                donate(getId(),proName(),mData.address);
+                                }}>donate</button>
+                        </div>
                     </div>
                     {proMessage()}
                     <hr />
@@ -209,7 +220,10 @@ const PostCardView = (data) => {
 
 const Posts = ({props}) => {
 
+    
+
     const { postData, setPostsData } = useContext(BackendContext);
+   
 
     const iconsStyle = {color:"blue", fontSize:"2.0em"}
 
@@ -223,9 +237,14 @@ const Posts = ({props}) => {
      }
      
 
-     const myAddress = "TJK1HyqM1XeVe1kY6RKkzwKWSU97hYrNhr";
-
      const myTronweb = window.tronWeb;
+     const [load, setLoad] = useState(false);
+     const [lastIndex, setLastIndex ] = useState(false);
+     const [ perPage, setPerPage ] = useState(4);
+     const currentIndex= useRef(0);
+     const [ initIndex, setInitIndex ] = useState(true)
+
+     let num = 0;
 
      useEffect(() => {
 
@@ -233,41 +252,99 @@ const Posts = ({props}) => {
 
             try {
                 
+
                 const instance = await myTronweb.contract(contractAbi,contractAddress);
-                const mPosts = await instance.getUserPosts(myAddress).call();
 
-                /*
-                mPosts.forEach(element => {
-                    
-                    const mData = {
+                const postId = await instance.getPostCounter().call();
+
+                let total  = postId.postCounter.toNumber()
+
+                if(initIndex){
+
+                    console.log("Current index", currentIndex.current)
+                    num = currentIndex.current;
+
+                    for(let i = 0; i < perPage; i++){
+
+                        setLoad(true);
+                        if(num > total){
+                            setLastIndex(true)
+                            break;
+                        }
+                        setLastIndex(false)
+    
+                        const mPosts = await instance.getUserPost(num).call();
+                        const myProfile = await instance.getProfile(myTronweb.address.fromHex(mPosts.mAddress)).call();
+                        const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath));
+                       
+                        let url = ''
+                        try {
+                            const getMediaUrl = await getDownloadURL(ref(storage,"postimg/"+ urlpath + "/" + mPosts.postId));
+                            url = getMediaUrl
+                        } catch (error) {
+                            console.log(error)
+                        }
+            
+                        const mData = {
+                            
+                            postIndex: i,
+    
+                            postId: mPosts.postId,
+                            address: mPosts.mAddress,
+                            affiliation: mPosts.affliation,
+                            minAmount: mPosts.minAmount,
+                            caption: mPosts.caption,
+                            message: mPosts.message,  
+                           // mediaUrl: mPosts.mediaUrls,
+                            dateCreated:mPosts.dateCreated,
+                            
+                            firstName: myProfile.userAddress.userName.firstName,
+                            lastName: myProfile.userAddress.userName.lastName,
+                            profileType: myTronweb.toUtf8(myProfile.userAddress.ProfileType),
+                            bio:myProfile.userAddress.bio, 
+                            country: myTronweb.toUtf8(myProfile.userAddress.Contact.country), 
+                            verified: myProfile.userAddress.isVeried,
+    
+                            profileImg: profileUrl,
+                            mediaUrl: url,
+        
+                        };
+    
+                        setPostsData((prevState) => [...prevState,mData])
+
                         
-                        postId: myTronweb.toUtf8(element.postId),
-                        address: element.mAddress,
-                        affiliation: element.affliation,
-                        minAmount: myTronweb.toUtf8(element.minAmount),
-                        caption: window.tronWeb.toUtf8(element.caption),
-                        message: myTronweb.toUtf8(element.message),  
-                        mediaUrl: myTronweb.toUtf8(element.mediaUrls),
-                        dateCreated:element.dateCreated,
-                        dateModifies: element.dateModified, 
+                        num ++;
+                        currentIndex.current = num
+                    }
 
+                    setLoad(false);
                     
-                    };
+                }
 
-                    setPostData((prevState) => [...prevState,mData])
-                    console.log(pagesData)
-                });
-                    */
-                console.log("Posts ",mPosts);
+                console.log("set num",num)
+                currentIndex.current = num
+
+                
+                
             } catch (error) {
-                console.log(error);
+              
+                console.log(error)
             }
             
         })();
       
-        // return () => {
-        // };
-    }, []);
+         return () => {
+            console.log("num in return",num)
+         };
+    }, [initIndex]);
+
+    const Loader = (classProps) => {
+        return (
+            <div className=" flex justify-center items-center py-3">
+                <div className={` animate-spin rounded-full h-10 w-10  ${classProps} border-b-4 border-purple-500`}/>
+            </div>
+        )
+    }
 
 
     const posts =  postData.map((items,index)=> {
@@ -275,13 +352,19 @@ const Posts = ({props}) => {
             items ="";
             console.log("Item key",index);
         }
-            
+
         return <PostCardView data={items}/>
     })
 
     return (
-        <div>
-            {posts}
+        <div className=' mt-2 rounded-md p-2 w-full'>
+
+            {posts }
+            
+            <div>
+                { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No more posts</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}
+                
+            </div>
         </div>
     )
 }

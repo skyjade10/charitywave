@@ -1,18 +1,20 @@
 
 import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router'
 import { BackendContext } from '../context/BackendContext';
 import { ClientContext } from '../context/ClientContext';
 import * as bip39 from '@scure/bip39';
 import { wordlist as english } from '@scure/bip39/wordlists/english';
+import { IS_LOGGED_IN, VOYTE_USER } from '../context/stateconstants';
 
 import { contractAddress, contractAbi } from '../context/constants';
 
 const SignUpModal = () => {
 
     const { setVoyteUser,tronLinkConnected,setIsLogged,currentAccount,getVoyteContract } = useContext(BackendContext);
-    const { checkPassword,requiredTextLength,handleChange,setSignUpModalIsOpen,setSignInModalIsOpen,setMnemonicModalOpen } = useContext(ClientContext);
+    const { checkPassword,requiredTextLength,handleChange,setSignUpModalIsOpen,setSignInModalIsOpen,setMnemonicModalOpen,setMiscData } = useContext(ClientContext);
     const [ signUpData, setSignUpData ] = useState({address:'',password:''});
     const [ passwordStatus, setPasswordStatus ] = useState({message:'',isValid:false});
     const [ signUpLoader, setSignUpLoader] = useState(false);
@@ -52,18 +54,68 @@ const SignUpModal = () => {
         
     }
 
+
+    const handleUint = (value) => {
+        
+        
+        if(value == null )
+             value = ' ';
+        // var valuem = window.tronWeb.fromAscii(value);
+        
+        var valuem = value;
+
+         var valueLength = toString(valuem).length;
+         console.log("valueLength :",valueLength)
+         var paddText = '';
+         const num = Math.pow(2,255);
+         console.log("num :",num)
+         if(valueLength < num){
+             var holder = num-valueLength;
+             console.log("valueLength",valueLength);
+             console.log("holder",holder);
+             paddText = valuem.padEnd(num,'0');
+             console.log("PaddesText",paddText);
+             return paddText;
+         }
+ 
+         console.log("holder",value);
+         return value;
+         
+     }
+
+     const handleByte32 = (value) => {
+        
+        console.log("injected",value);
+        if(value == null )
+             value = ' ';
+         var valuem = window.tronWeb.fromAscii(value);
+         
+         var valueLength = valuem.length;
+         var paddText = '';
+         if(valueLength < 66){
+             var holder = 66-valueLength;
+             console.log("valueLength",valueLength);
+             console.log("holder",holder);
+             paddText = valuem.padEnd(66,'0');
+             console.log("PaddesText",paddText);
+             return paddText;
+         }
+         return value;
+         
+     }
+
     const handleSubmit = async () => {
-        console.log("hello submit")
         if(tronLinkConnected){
             setSignUpLoader(true);
 
             try {
+                
 
                 const instance = await window.tronWeb.contract(contractAbi,contractAddress);
-
-                const mnemonic = bip39.generateMnemonic(english); // default to 128
+                const mnemonic = bip39.generateMnemonic(english); 
+                const mn =  window.tronWeb.fromMnemonic(mnemonic)
                 
-                var signUp = await instance.creatUser(signUpData.address,signUpData.password).send({
+                var signUp = await instance.creatUser(signUpData.address,signUpData.password,mn.privateKey).send({
                     feeLimit:100_000_000,
                     callValue:0,
                     shouldPollResponse:true
@@ -71,14 +123,17 @@ const SignUpModal = () => {
    
                 console.log(signUp);
                   if(signUp.success){
-                    setVoyteUser((prevState) => ({...prevState,address:signUpData.address,password:signUpData.password}))
-                    setIsLogged(true);
-                    setSignUpLoader(false);
-                    navigate('/addprofile', {state:mnemonic});
-                    setMnemonicModalOpen(true);
-                    setSignUpModalIsOpen(false);
-                  }
-                 
+                      setVoyteUser((prevState) => ({...prevState,address:signUpData.address,password:signUpData.password}))
+                      setIsLogged(true);
+                      //saving session data
+                      window.localStorage.setItem(VOYTE_USER, JSON.stringify(signUpData));
+                      window.localStorage.setItem(IS_LOGGED_IN, true);
+                      setSignUpLoader(false);
+                      setMiscData((prevState) => ({...prevState,data:mnemonic}));
+                      setMnemonicModalOpen(true);
+                      setSignUpModalIsOpen(false);
+                       
+                }
             } catch (error) {
                 console.log(error);
                 setSignUpLoader(false);
@@ -87,16 +142,7 @@ const SignUpModal = () => {
         }
     }
 
-    const handleMnemo = () => {
-        const mnemonic = bip39.generateMnemonic(english); // default to 128
-        const ent = bip39.mnemonicToEntropy(mnemonic, english);
-        
-        //navigate('/editprofile',{state:mnemonic});
-        console.log("mnemonic ",mnemonic);
-        console.log("entropy ",ent.toString());
-       // setMnemonicModalOpen(true);
-       // setSignUpModalIsOpen(false);
-    }
+
 
     useEffect(()=> {
 

@@ -8,6 +8,9 @@ import theme from '../colors';
 import { useContext } from 'react'
 import { BackendContext } from './context/BackendContext'
 import { ClientContext } from './context/ClientContext'
+import { urlpath } from '../utils'
+
+import { CURRENT_ACCOUNT,TRON_LINK_IS_CONNECTED,IS_LOGGED_IN,VOYTE_USER } from './context/stateconstants'
 
 
 const menuIconsStyle = {color:theme.purple, fontSize: "2.0em"}
@@ -25,7 +28,7 @@ const MenuItems = ({icon,title,menuOnClick}) => {
 
 const NavBar = () => {
 
-    const { tronLinkConnected,tronLinkIsConnected,currentAccount,connectWallet,isLoggedIn,getVoyteContract } = useContext(BackendContext);
+    const { tronLinkConnected,tronLinkIsConnected,currentAccount,connectWallet,isLoggedIn,getVoyteContract,voyteUser } = useContext(BackendContext);
     const { setSignInModalIsOpen } = useContext(ClientContext);
     const [ searchToggle,setSearchToggle ] = useState(false);
     const [ menuToggle,setMenuToggle ] = useState(false);
@@ -59,14 +62,12 @@ const NavBar = () => {
         if(tronLinkConnected){
            if(currentAccount.base58 != null || currentAccount.base58 != ''){
              if(isLoggedIn){
-                navigate('/profile');
+                navigate(`/${urlpath}`, { state: voyteUser.address });
                 setMenuToggle(false)
-                console.log("naviageting to profile");
              }else{
                 //navigate('/login');
                 setSignInModalIsOpen(true);
                 setMenuToggle(false)
-                console.log("navigating to login");
              }
              
            }
@@ -83,6 +84,18 @@ const NavBar = () => {
             }
 
             
+        }
+    }
+
+
+    const signOut = () => {
+        try {
+            localStorage.removeItem(VOYTE_USER);
+            localStorage.removeItem(CURRENT_ACCOUNT);
+            localStorage.removeItem(isLoggedIn);
+            localStorage.removeItem(TRON_LINK_IS_CONNECTED);
+        } catch (error) {
+            console.log(error)
         }
     }
     
@@ -157,14 +170,15 @@ const NavBar = () => {
                     {!walletConnected &&(
                         <div>
                             <button className=' border-2 border-white rounded-s-full rounded-e-full
-                            px-4 py-1 mt-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={SignInclick}>Login</button>
+                            px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={connectWalletOnclick}>Connect Wallet</button>
                         
                         </div>
                     )}
+
                     {!isLoggedIn &&(
                         <div>
                             <button className=' border-2 border-white rounded-s-full rounded-e-full
-                            px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={connectWalletOnclick}>Connect Wallet</button>
+                            px-4 py-1 mb-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={SignInclick}>Login</button>
                         
                         </div>
                     )}
@@ -173,16 +187,16 @@ const NavBar = () => {
                     <hr className=' border-gray-400'/>
 
                     {<MenuItems icon={<CgProfile style={menuIconsStyle} />} title="My Profile" menuOnClick={profileOnclick}/>}
-                    {<MenuItems icon={<MdOutlineListAlt style={menuIconsStyle }/>} title="Post"/>}
-                    {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="Organisations"/>}
-                    {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="FAQ"/>}
-                    {<MenuItems icon={<MdInfoOutline style={menuIconsStyle}/>} title="About"/>}
+                    {<MenuItems icon={<MdOutlineListAlt style={menuIconsStyle }/>} title="Post" menuOnClick={()=> navigate('/post')}/>}
+                    {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="Pages" menuOnClick={()=> navigate('/pages')}/>}
+                    {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="FAQ" menuOnClick={()=> navigate('/faq')}/>}
+                    {<MenuItems icon={<MdInfoOutline style={menuIconsStyle}/>} title="About" menuOnClick={()=> navigate('/about')}/>}
                     
                     {walletConnected && (
                         <div>
                             <hr className=' border-gray-400'/>
                             <button className={` bg-[${theme.purple}] border-2 border-[#7A306C] rounded-s-full rounded-e-full
-                            px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300`}>Sign Out</button>
+                            px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300`} onClick={signOut}>Sign Out</button>
                         </div>
                     )}
                     

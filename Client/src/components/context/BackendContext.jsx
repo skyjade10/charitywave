@@ -1,6 +1,8 @@
 import React, { useEffect, useState} from "react";
 import { contractAddress, contractAbi } from '../context/constants';
 
+import { CURRENT_ACCOUNT,TRON_LINK_IS_CONNECTED,IS_LOGGED_IN,VOYTE_USER } from "./stateconstants";
+
 export const BackendContext = React.createContext();
 
 //const tron = window.tron;
@@ -50,6 +52,8 @@ export const BackendProvider = ({children}) => {
             if(connected.code == 200){
                 alert("TronLink connected");
                 setTronLinkConnected(true);
+                //save tronlink connection state even after refresh
+                window.sessionStorage.setItem(TRON_LINK_IS_CONNECTED, true);
                 console.log("my tron web",connected);
                 return true;
             }
@@ -72,6 +76,8 @@ export const BackendProvider = ({children}) => {
 
                 const accounts = await window.tronWeb.defaultAddress;
                 setCurrentAccount(accounts);
+                //save account state even after refresh
+                window.sessionStorage.setItem(TRON_LINK_IS_CONNECTED, true);
                 setTronLinkConnected(true);
 
                 return true;
@@ -109,6 +115,28 @@ export const BackendProvider = ({children}) => {
             
         }
     }
+
+
+    useEffect(() => {
+
+        console.log("running use effect backcontec")
+
+        if(JSON.parse(window.localStorage.getItem(VOYTE_USER)) != null){
+            setVoyteUser(JSON.parse(window.localStorage.getItem(VOYTE_USER)));
+            setIsLogged(window.sessionStorage.getItem(IS_LOGGED_IN))
+        }
+
+        if(JSON.parse(window.localStorage.getItem(CURRENT_ACCOUNT)) != null){
+            
+            setCurrentAccount(JSON.parse(window.localStorage.getItem(CURRENT_ACCOUNT)))
+        }
+        if(window.localStorage.getItem(TRON_LINK_IS_CONNECTED) != null){
+
+            setTronLinkConnected(window.localStorage.getItem(TRON_LINK_IS_CONNECTED))
+        }
+        
+        
+      }, []);
 
     
 

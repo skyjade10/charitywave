@@ -1,145 +1,133 @@
 import React, { useContext, useState,useRef } from "react";
 import { ClientContext } from "./context/ClientContext";
-import cover from '../assets/images/used.jpg'
+import cover from '../assets/images/user.png'
 import { useNavigate } from "react-router";
+import { BackendContext } from "./context/BackendContext";
+import { MdKeyboardArrowDown } from 'react-icons/md'
+
+import { storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import { contractAddress, contractAbi } from '../components/context/constants';
+import {  urlpath  } from "../utils";
+import { useParams,useLocation } from "react-router";
+import { useEffect } from "react";
 
 const EditProfile = () => {
 
-    const { profileData, setProfileData } = useState(
-        {
-            firstName: "Zambwe",
-            lastName: "Nasilele",
-            email:" World health Org",
-            contact:"09722893465",
-            website: "www.zana.com",
-            homeAddress: "2516 Zamclay",
-            profileType: "Individual",
-            location: "Kalulushi, Zambia", 
-            profileImg: "",
-            coverImg: "",
-            bio: "Lm ipsuissimos consectetur ea nulla minima."
-    
-        }
-    );
-
-    const { validateEmail,checkPassword,requiredTextLength,handleChange} = useContext(ClientContext);
-
-    const  [firstName, setFirstName]= useState({message:'', isValid:true});
-    const  [lastName, setLastName] = useState({message:"",isValid:true});
-    const  [email, setEmail] = useState({message:"",isValid:true});
-    const  [contact, setContact] = useState({message:"",isValid:true});
-    const  [website, setWebsite] = useState({message:"",isValid:true});
-    const  [homeAddress, setHomeAddress] = useState({message:"",isValid:true});
-    const  [profileType, setProfileType] = useState({message:"",isValid:true});
-    const  [country, setCountry] = useState({message:"",isValid:true});
-    const  [city, setCity] = useState({message:"",isValid:true});
-    const  [profileImg, setProfileImg] = useState({message:"",isValid:true});
-    const  [coverImg, setCoverImg] = useState({message:"",isValid:true});
-    const  [bio, setBio] = useState({message:"",isValid:true});
-
-    const navigate = useNavigate();
+   
 
     //checks if the names meet the requirements i.e length
     const handleFirstName = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setFirstName((prevState)=>({...prevState, message:"",isValid:true}));
+            
+         if(requiredTextLength(value,31)){
+            setFirstName((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(firstName);
          }else{
             
             setFirstName((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+            console.log(firstName);
          }
     }
 
     //checks if Last name meet the requirements i.e length
     const handleLastName = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setLastName((prevState)=>({...prevState, message:"",isValid:true}));
+         if(requiredTextLength(value,31)){
+            setLastName((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(lastName);
          }else{
             
             setLastName((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+            console.log(lastName);
          }
     }
 
     //checks if Last name meet the requirements i.e length
     const handleEmail = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setLastName((prevState)=>({...prevState, message:"",isValid:true}));
+         if(requiredTextLength(value,31)){
+            setEmail((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(email);
          }else{
             
             setEmail((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
-           
+            console.log(email);
          }
 
          if(validateEmail(value)){
-            setEmail((prevState)=>({...prevState, message:"",isValid:true}));
+            setEmail((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(email);
             
         }else{
             setEmail((prevState)=>({...prevState, message:"Enter a valid email",isValid:false}));
+            console.log(email);
         }
     }
 
     //checks if Home meet the requirements i.e length
     const handleHomeAddress = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setHomeAddress((prevState)=>({...prevState, message:"",isValid:true}));
+         if(requiredTextLength(value,31)){
+            setHomeAddress((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(homeAddress);
          }else{
             
             setHomeAddress((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+            console.log(homeAddress);
          }
     }
 
     //checks if Home meet the requirements i.e length
     const handleWebsite = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setWebsite((prevState)=>({...prevState, message:"",isValid:true}));
+         if(requiredTextLength(value,31)){
+            setWebsite((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(website);
          }else{
             
             setWebsite((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+            console.log(website);
          }
     }
 
     //checks if Home meet the requirements i.e length
     const handleCountry = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setCountry((prevState)=>({...prevState, message:"",isValid:true}));
+         if(requiredTextLength(value,31)){
+            setCountry((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(country);
          }else{
             
             setCountry((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+            console.log(country);
          }
     }
 
     //checks if Home meet the requirements i.e length
     const handleCity = (mData) => {
         let {name, value} = mData;
-
-         if(requiredTextLength(value,100)){
-            setCity((prevState)=>({...prevState, message:"",isValid:true}));
+         if(requiredTextLength(value,31)){
+            setCity((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(city);
          }else{
             
             setCity((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+            console.log(city);
          }
     }
 
     //checks if Home meet the requirements i.e length
     const handleBio = (mData) => {
         let {name, value} = mData;
-
          if(requiredTextLength(value,1000)){
-            setBio((prevState)=>({...prevState, message:"",isValid:true}));
+            setBio((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+            console.log(bio);
          }else{
             
             setBio((prevState)=>({...prevState, message:"Character length exceeded (Max is 1000 chars)",isValid:false}));
+            console.log(bio);
          }
     }
 
@@ -152,104 +140,403 @@ const EditProfile = () => {
             var num = 0;
             num = parseInt(value);
 
-            if(requiredTextLength(value,100)){
-                setContact((prevState)=>({...prevState, message:"",isValid:true}));
+            if(requiredTextLength(value,31)){
+                setContact((prevState)=>({...prevState, value:num,message:"",isValid:true}));
+                console.log(contact);
              }else{
                 
                 setContact((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+                console.log(contact);
              }
             
         } catch (error) {
             setContact((prevState)=>({...prevState, message:"Please enter a valid number",isValid:false}));
+            console.log(contact);
             
         }
 
          
     }
 
+    const [ proImgState,setProImgState ] = useState({selectedFile: null,fileUrl:''});
+    const [ coverImgState,setCoverImgState ] = useState({selectedFile: null,fileUrl:''});
+
+    const onProfileFileChange = (e) => {
+
+        console.log(e.target.name);
+
+        let proUrl = "profileImg/" + urlpath;
+        setProImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:proUrl}));
+
+        console.log("Url ",proImgState.fileUrl," Selected file", proImgState.selectedFile);
+        
+    }
+
+
+    const onCoverFileChange = (e) => {
+
+        console.log(e.target.name);
+        
+        let covUrl = "coverImg/" + urlpath;
+        setCoverImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:covUrl}));
+
+        console.log("Url ",coverImgState.fileUrl," Selected file", coverImgState.selectedFile);
+       
+    }
+
+    const handleFileUpload  = async (e) => {
+ 
+        try {
+
+            console.log(e.target.value);
+            
+            if(proImgState.selectedFile != null){
+                let imageRef = ref(storage, `${proImgState.fileUrl}`);
+                var upload = await uploadBytes(imageRef,proImgState.selectedFile);
+                console.log(" Profile Image Uploaded",upload);
+
+                let getUrl = await getDownloadURL(upload.ref)
+                console.log(" Profile Image downloaded",getUrl);
+
+                //Show the uploaded image
+                var setImage ='';
+                if( getUrl != '' && getUrl != null){
+
+                    setImage = document.getElementById("profileimage");
+                    setImage.src = `${getUrl}`;
+                }else{
+
+                    setImage.src = cover;
+                }
+              
+            }
+            // if(e.target.name == 'profileimg'){
+
+            // }
+            if(proImgState.selectedFile != null){
+                let imageRefc = ref(storage, `${coverImgState.fileUrl}`);
+                var uploadn = await uploadBytes(imageRefc,coverImgState.selectedFile);
+                console.log(" Cover Image Uploaded",uploadn);
+
+                let getUrl = await getDownloadURL(uploadn.ref);
+                console.log(" Cover Image downloaded",getUrl);
+
+                //Show the uploaded image
+                var setImage = '';
+                if( getUrl != '' && getUrl != null){
+                    setImage = document.getElementById("coverimage");
+                    setImage.src = `${getUrl}`;
+                }else{
+
+                    setImage.src = cover;
+                }
+
+            }
+            // if(e.target.name == 'coverimg'){
+
+            // }
+        } catch (error) {
+            console.log(error)
+        }
+        
+    };
+
+
+    const { tronLinkConnected,isLoggedIn,voyteUser,setVoyteUser,setIsLogged } = useContext(BackendContext);
+    const { validateEmail,checkPassword,requiredTextLength,handleChange,setMnemonicModalOpen} = useContext(ClientContext);
+    const [ signUpLoader, setSignUpLoader] = useState(false);
+
+    const  [firstName, setFirstName]= useState({value:null,message:'', isValid:true});
+    const  [lastName, setLastName] = useState({value:null,message:"",isValid:true});
+    const  [email, setEmail] = useState({value:null,message:"",isValid:true});
+    const  [contact, setContact] = useState({value:null,message:"",isValid:true});
+    const  [website, setWebsite] = useState({value:null,message:"",isValid:true});
+    const  [homeAddress, setHomeAddress] = useState({value:null,message:"",isValid:true});
+    const  [profileType, setProfileType] = useState({value:null,message:"",isValid:true});
+    const  [country, setCountry] = useState({value:null,message:"",isValid:true});
+    const  [city, setCity] = useState({value:null,message:"",isValid:true});
+    const  [bio, setBio] = useState({value:null,message:"",isValid:true});
+
+    const urlParams = useParams();
+    const location = useLocation();
+
 
     
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+
+
+        //username tupple
+        const mFirstN =  firstName.value;
+        const mLastN =  lastName.value;
+        const username =[ mFirstN,mLastN];
+        console.log("ussername tuple", username);
+        console.log("ussername tuple", firstName.value);
+
+        //contact tupple
+        const mEmail =  handleByte32(email.value);
+        const mWebsite =  handleByte32(website.value);
+        const mContact =  contact.value;
+        const mHome =  handleByte32(homeAddress.value);
+        const mCountry = handleByte32(country.value);
+        const mycontact = [mEmail,mWebsite,mContact,mHome,mCountry];
+
+        console.log("contact tuple",mycontact);
+
+       // const mBio = bio.value //string
+        //const mCountry = country
+
+        if(isLoggedIn){
+            console.log("add islogged")
+            if(tronLinkConnected){
+                console.log("add tron")
+                try {
+
+                    
+                    const instance = await window.tronWeb.contract(contractAbi,contractAddress);
+                    setSignUpLoader(true)
+                    const signUp = await instance.editProfile(
+                        voyteUser.address,voyteUser.password,username,mycontact,bio.value, 
+                        handleByte32(profileType.value)
+                    ).send({
+                        feeLimit:400_000_000,
+                        callValue:0,
+                        shouldPollResponse:true
+                      });
+        
+                      if(signUp.success){
+                        alert("profile updated")
+                      }
+
+
+                } catch (error) {
+                    console.log(error);
+                    alert("something went wrong")
+                    setSignUpLoader(false)
+                }
+            }
+        }
 
     }
 
-    const handleCancel = () => {
-        navigate('/profile');
+    
+
+    const menuTypeItemToggle = () => {
+
+        const menuItemContainer = document.getElementById("menu-item-container");
+        menuItemContainer.style.display = 'inline'
+
     }
+
+    const menuTypeItemSelect = (e) => {
+
+        e.preventDefault()
+        
+
+        const mValue = e.target.innerText.toLowerCase().trim();
+
+        console.log(mValue);
+
+        if(mValue !== ''){
+
+            if(mValue == "organisation" || mValue == "individual" || mValue == "group"){
+
+                const selectedMenuItem = document.getElementById("menu-item-selected");
+                selectedMenuItem.innerText = mValue;
+    
+                setProfileType((prevState) => ({...prevState,value:mValue}));
+        
+                const menuItemContainer = document.getElementById("menu-item-container");
+                menuItemContainer.style.display = 'none'
+                console.log("inste");
+            }
+        }
+
+
+    }
+
+    const handleByte32 = (value) => {
+        
+       console.log("injected",value);
+       if(value == null )
+            value = ' ';
+        var valuem = window.tronWeb.fromAscii(value);
+        
+        var valueLength = valuem.length;
+        var paddText = '';
+        if(valueLength < 66){
+            var holder = 66-valueLength;
+            console.log("valueLength",valueLength);
+            console.log("holder",holder);
+            paddText = valuem.padEnd(66,'0');
+            console.log("PaddesText",paddText);
+            return paddText;
+        }
+        return value;
+        
+    }
+
+    const Loader = (classProps) => {
+        return (
+            <div className=" flex justify-center items-center py-3">
+                <div className={` animate-spin rounded-full h-10 w-10  ${classProps} border-b-4 border-purple-500`}/>
+            </div>
+        )
+    }
+
+    useEffect(() => {
+        (async () => {
+            if(isLoggedIn){
+                try {
+                    const menuItemContainer = document.getElementById("menu-item-container");
+                    menuItemContainer.style.display = 'inline'
+                    const proData = location.state;
+                    
+                    if(proData !== null){
+                        console.log("profile data", proData.lastName);
+                        setFirstName((prevState)=>({...prevState, value:proData.firstName,message:"",isValid:true}));
+
+                        const firstNameInput = document.getElementById('firstname');
+                        firstNameInput.setAttribute('value',proData.firstName)
+
+                        const lastNameInput = document.getElementById('lastname');
+                        lastNameInput.setAttribute('value',proData.lastName)
+
+                        const emailInput = document.getElementById('email');
+                        emailInput.setAttribute('value',proData.email)
+
+                        const contactInput = document.getElementById('contact');
+                        contactInput.setAttribute('value',proData.phone)
+
+                        const websiteInput = document.getElementById('website');
+                        websiteInput.setAttribute('value',proData.website)
+
+                        const homeAddressInput = document.getElementById('homeaddress');
+                        homeAddressInput.setAttribute('value',proData.physicalAddress)
+
+                        const profileTypeInput = document.getElementById('menu-item-selected');
+                        profileTypeInput.innerHTML = proData.profileType
+
+                        const countryInput = document.getElementById('country');
+                        countryInput.setAttribute('value',proData.country)
+
+                        const bioInput = document.getElementById('bio');
+                        bioInput.textContent = proData.bio
+                        
+                    }
+                    
+                    
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        })();
+    },[])
 
     const inPutClass = " border-2 w-full outline-none p-2 text-sm text-gray-900 border-gray-300 bg-gray-50 rounded-md hover:border-purple-500 focus:border-purple-800";
     const textClass = " font-bold text-sm mt-2";
     const divClass = " flex flex-col justify-center items-start ";
     return (
-        <div className=" w-full grid grid-cols-[auto] justify-center ">
-            <div className="flex w-[700px] flex-col justify-center items-center border-2 rounded-lg shadow-md m-4  ">
-
-                <div className=" grid grid-cols-2 gap-4 p-4 w-2/3">
+        <div className="background-gradient w-full grid grid-cols-[auto] justify-center ">
+            <div className="bg-gray-50 flex w-[700px] flex-col justify-center items-center border-2 rounded-lg shadow-md m-4 gap-4 ">
+                <div className=" mt-4 font-bold border-b-2 w-3/4 mx-4 pb-2">
+                    <h2>Editing Profile </h2>
+                </div>
+                <div className=" grid grid-cols-2 gap-4  w-2/3">
                     <div className=" m-1 text-sm text-gray-900">
+                        <p className=" text-md text-bold ">Cover Image</p>
                         <div className=' w-36 md:me-2 m-1'>
-                            <img className=' w-full h-full' src={cover} alt="post-profile-pic" />
+                            <img className=' w-full max-h-[150px] aspect-auto' src={cover} alt="cover-pic" id="coverimage" />
                         </div>
-                        <p> select cover</p>
+                        <div className="flex flex-row justify-between items-center text-xs mt-2">
+                            <input type={'file'} name="coverimg" onChange={onCoverFileChange}/>
+                            { <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm"  name="coverimg" onClick={handleFileUpload}>Upload</button> }
+                        </div>
                     </div>
+                    { signUpLoader && (<div className=' flex flex-col justify-center items-center z-20 fixed  backdrop-blur-sm h-screen
+                    max-w-[500px] w-5/6 sm:w-[700px] lg:w-[700px] gap-4' id='signUpLoader'>
+                        <p>Please wait this may take a while</p>
+                        <Loader/>
+                        <button className=" hover:bg-purple-400 rounded-md px-4 py-1 bg-purple-600 text-white cursor-pointer" onClick={()=>setSignUpLoader(false)}>cancel</button>
+                        </div>)}
 
-                    <div className=" m-1 text-sm text-gray-900">
+                    <div className="  m-1 text-sm text-gray-900">
+                        <p className=" text-md text-bold ">Profile Image</p>
                         <div className=' w-36 md:me-2 m-1'>
-                            <img className=' w-full h-full' src={cover} alt="post-profile-pic" />
+                            <img className=' w-full max-h-[150px]' src={cover} alt="profile-pic" id="profileimage" />
                         </div>
-                        <p> select cover</p>
+                        <div className="flex flex-row justify-between items-center text-xs mt-2">
+                            <input type={'file'} name="profileimg" onChange={onProfileFileChange}/>
+                            { <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="profileimg" onClick={handleFileUpload}>Upload</button> }
+                        </div>
                     </div>
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>First Name </p> 
                         <p className=" text-xs text-red-600">{firstName.message}</p> 
-                        <input name="firstname" className={` ${inPutClass} `} onChange={(e)=>{handleFirstName(handleChange(e));}}/>
+                        <input id="firstname" name="firstname" className={` ${inPutClass} `} onChange={(e)=>{handleFirstName(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>Last Name</p> 
                         <p className=" text-xs text-red-600">{lastName.message}</p> 
-                        <input name="lastname" className={` ${inPutClass} `} onChange={(e)=>{handleLastName(handleChange(e));}}/>
+                        <input id="lastname" name="lastname" className={` ${inPutClass} `} onChange={(e)=>{handleLastName(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>Email</p>
                         <p className=" text-xs text-red-600">{email.message}</p>  
-                        <input name="email" className={` ${inPutClass}`} onChange={(e)=>{handleEmail(handleChange(e));}}/>
+                        <input id="email" name="email" className={` ${inPutClass}`} onChange={(e)=>{handleEmail(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>Phone</p>
                         <p className=" text-xs text-red-600">{contact.message}</p>  
-                        <input name="phone" className={` ${inPutClass}`} onChange={(e)=>{handleContact(handleChange(e));}}/>
+                        <input id="contact" name="phone" className={` ${inPutClass}`} onChange={(e)=>{handleContact(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>Address</p> 
                         <p className=" text-xs text-red-600">{homeAddress.message}</p> 
-                        <input name="address" className={` ${inPutClass}`} onChange={(e)=>{handleHomeAddress(handleChange(e));}}/>
+                        <input id="homeaddress" name="address" className={` ${inPutClass}`} onChange={(e)=>{handleHomeAddress(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>Website</p> 
                         <p className=" text-xs text-red-600">{website.message}</p> 
-                        <input name="website" className={` ${inPutClass}`} onChange={(e)=>{handleWebsite(handleChange(e));}}/>
+                        <input id="website" name="website" className={` ${inPutClass}`} onChange={(e)=>{handleWebsite(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>Country</p>
                         <p className=" text-xs text-red-600">{country.message}</p> 
-                        <input name="country" className={` ${inPutClass}`} onChange={(e)=>{handleCountry(handleChange(e));}}/>
+                        <input id="country" name="country" className={` ${inPutClass}`} onChange={(e)=>{handleCountry(handleChange(e));}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>City</p>
                         <p className=" text-xs text-red-600">{city.message}</p> 
-                        <input name="city" className={` ${inPutClass}`} onChange={(e)=>{handleCity(handleChange(e));}}/>
+                        <input id="city" name="city" className={` ${inPutClass}`} onChange={(e)=>{handleCity(handleChange(e));}}/>
                     </div>
 
-                    <div className={` ${divClass}`}>
-                        <p className={` ${textClass}`}>Type</p> 
-                        <input name="type" className={` ${inPutClass}`} />
+                    <div className={` relative inline-block text-left`} >
+    
+                        <p  className={` ${textClass}`}>Type</p>
+                        <div className=" flex flex-row justify-between items-center cursor-pointer px-2 py-2
+                         border-[2px] h-10 bg-slate-50 border-gray-300 hover:bg-gray-200 rounded-md " onClick={menuTypeItemToggle}>
+                            <p  className="text-gray-900  text-sm "  id="menu-item-selected"></p>
+                            <MdKeyboardArrowDown style={{fontSize:"1.8em"}}/> 
+                        </div>
+            
+                        <div className=" absolute border rounded-md bg-white right-0  shadow-lg ring-1 ring-black
+                         ring-opacity-5 mt-2 " id="menu-item-container">
+                            <div className=" cursor-pointer " role="none">
+
+                                <p  className="text-gray-900 block px-4 py-2 text-sm hover:bg-gray-200" role="menuitem"  id="menu-item-0" value ="individual" onClick={menuTypeItemSelect}>Individual</p>
+                                <p  className="text-gray-900 block px-4 py-2 text-sm  hover:bg-gray-200" role="menuitem"  id="menu-item-1" value ="group" onClick={menuTypeItemSelect}>Group</p>
+                                <p  className="text-gray-900 block px-4 py-2 text-sm  hover:bg-gray-200" role="menuitem"  id="menu-item-2" value ="organisation" onClick={menuTypeItemSelect}>Organisation</p>
+                                {/* <input name="type" className={` ${inPutClass}`} /> */}
+                            </div>
+                        </div>
                     </div>
                     
                 </div>
@@ -257,12 +544,12 @@ const EditProfile = () => {
                 <div className="  flex flex-col items-center m-4 w-4/6">
                     <p className={` ${textClass}`}>Bio:</p> 
                     <p className=" text-xs text-red-600">{bio.message}</p> 
-                    <textarea className={` ${inPutClass} w-1/3 h-[250px] rounded-md text-sm`} onChange={(e)=>{handleBio(handleChange(e));}}/>
+                    <textarea id="bio" className={` ${inPutClass} w-1/3 h-[250px] rounded-md text-sm`} onChange={(e)=>{handleBio(handleChange(e));}}/>
                 </div>
 
-                <div className=" flex justify-between p-5 w-4/6">
-                    <b className=" bg-purple-900 py-1 px-6 rounded-s-full rounded-e-full cursor-pointer text-white font-normal hover:bg-purple-800 " onClick={handleCancel}>Cancle</b>
-                    <b className=" bg-purple-900 py-1 px-6 rounded-s-full rounded-e-full cursor-pointer text-white font-normal hover:bg-purple-800 " onClick={handleSubmit}>Save</b>
+                <div className=" flex justify-end p-5 w-4/6">
+                    <b className=" bg-purple-900 py-1 px-6 rounded-s-full rounded-e-full cursor-pointer
+                     text-white font-normal hover:bg-purple-800 " onClick={handleSubmit}>Save</b>
                 </div>
 
             </div>

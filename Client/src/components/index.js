@@ -6,6 +6,7 @@ export { default as Welcome } from './Welcome';
 export { default as Profile } from './Profile';
 export { default as  Search } from './Search';
 export { default as About } from './About';
+export { default as Faq } from './Faq';
 export { default as SignUp } from './SignUp';
 export { default as EditProfile } from './EditProfile';
 export { default as AddProfile } from './AddProfile';
@@ -18,8 +19,11 @@ export { default as Pages } from '../components/subcomponents/Pages';
 export { default as Posts } from '../components/subcomponents/Posts';
 export { default as PostDetail } from '../components/subcomponents/PostDetail';
 export { default as CreatePost } from '../components/subcomponents/CreatePost';
+export { default as MinAbout } from '../components/subcomponents/MinAbout'
 
 //Modals 
 export { default as SignInModal } from '../components/modals/SignInModal';
 export { default as SignUpModal } from '../components/modals/SignUpModal';
 export { default as MnemonicModal } from '../components/modals/MnemonicModal';
+export { default as InfoModal } from '../components/modals/InfoModal';
+export { default as TransactModal } from '../components/modals/TransactModal';

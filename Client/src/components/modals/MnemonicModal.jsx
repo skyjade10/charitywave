@@ -9,6 +9,8 @@ import { ClientContext } from '../context/ClientContext';
 
 
 
+
+
 const MnemoniItem = ({title, classProps}) => {
     return (
         <li className={`cursor-pointer text-gray-800  ${classProps}`} >
@@ -17,14 +19,16 @@ const MnemoniItem = ({title, classProps}) => {
     )
 }
 
-const MnemonicModal = () => {
+const MnemonicModal = (props) => {
 
     const { voyteUser, setVoyteUser,tronLinkConnected,setIsLogged } = useContext(BackendContext);
-    const { setSignInModalIsOpen,setMnemonicModalOpen } = useContext(ClientContext);
+    const { setSignInModalIsOpen,setMnemonicModalOpen,miscData } = useContext(ClientContext);
     const [ radioBtnStatus,setRadioBtnStatus ] = useState({aa:false,bb:false,cc:false});
     const [ mnemonicDataM, setMnemonicDataM ] = useState(['']);
     const navigate = useNavigate();
     const location = useLocation();
+
+    const mn = '';
 
 
     // const generateMnemo = () => {
@@ -35,11 +39,13 @@ const MnemonicModal = () => {
     
 
     const handleSubmit = async () => {
+        navigate('/addprofile');
         setMnemonicModalOpen(false);
         
     }
-    var btn;
+    
     const handleRadio = async (e) => {
+        var btn = document.getElementById("confirmBtn");
         let radioA = document.getElementById("aa").checked;
         let radioB = document.getElementById("bb").checked;
         let radioC = document.getElementById("cc").checked;
@@ -53,12 +59,13 @@ const MnemonicModal = () => {
     }
 
     useEffect(() =>{
-        btn = document.getElementById("confirmBtn");
+        var btn = document.getElementById("confirmBtn");
         btn.disabled = true;
+        
         var mn = "";
-        if(mn != null){
-            mn = location.state.split(' ');
-            console.log("mn",mn);
+        var mdata = miscData.data;
+        if(mn != null && mdata != null){
+            mn = mdata.split(' ');
             setMnemonicDataM((prevState) => mn);
             
         }
@@ -69,14 +76,15 @@ const MnemonicModal = () => {
         <div className=' max-w-[500px] w-2/4 sm:w-[300px] lg:w-[400px] bg-white px-4 rounded-md shadow-lg shadow-slate-700 ease-in' onClick={
             (e) => { e.stopPropagation()}
         }>
-            <p className=' text-sm m-4'>Requires TronLink to login</p>
+            <p>{mn}</p>
+            <p className=' text-sm m-4'>Requires TronLink to login </p>
             <div className=' grid grid-cols-3 list-none gap-5 lg:gap-5'>
                 {mnemonicDataM.map((item, index) => {
 
                     if(item != null && item != ''){
 
                         return (
-                            <div className=' border-2 bg-gray-200 border-gray-500 rounded-md hover:bg-purple-500 ' >
+                            <div className=' border-2 bg-gray-100 border-gray-500 rounded-md ' >
                                 <MnemoniItem key = {item + index} title = {item} classProps = " my-1 text-xs lg:text-sm" />
                             </div>
                         )

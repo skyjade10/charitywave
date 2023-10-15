@@ -10,8 +10,8 @@ const Ads = () => {
 
 
     return (
-        <div className= {` h-[70%] bg-[#CB0030] overflow-y-scroll w-auto ${myScrollBar}`}>
-            {"hello"}
+        <div className= {`mt-4 rounded-md h-[80vh]  bg-slate-50 overflow-y w-auto ${myScrollBar}`}>
+            {""}
         </div>
     )
 }

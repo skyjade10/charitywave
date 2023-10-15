@@ -8,13 +8,12 @@ import {
 
 const Home = ({left,main}) => {
     return (
-        <div className="background-gradient grid justify-center ">
-            <div className=" mx-4 mt-4 grid grid-flow-row md:grid-flow-col md:grid-cols-[30%,auto] gap-2,
-            lg:grid-cols-[25%,auto,20%] gap-3 absolute w-full ">
+        <div className="">
+            <div className=" grid gap-2 lg:grid-cols-[25%,auto,20%] md:grid-cols-[25%,auto,20%]  item-center px-4 h-full">
                 <div className=" hidden md:contents">
                     {left}
                 </div>
-                <div className=" relative border-s-2 border-e-2">
+                <div className=" relative  px-2  overflow-y">
                     {main}
                 </div>
                 <div className=" hidden lg:contents">

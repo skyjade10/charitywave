@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-constants.js
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +22,8 @@ constants.js
 *.njsproj
 *.sln
 *.sw?
+
+constants.js
+abi.json
+firebase.js
+utils.js

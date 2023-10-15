@@ -8,7 +8,9 @@ export const ClientProvider = ({children}) => {
     const [ signInModalIsOpen, setSignInModalIsOpen ] = useState(false);
     const [ signUpModalIsOpen, setSignUpModalIsOpen ] = useState(false);
     const [ mnemonicModalOpen, setMnemonicModalOpen ] = useState(false);
-    const [ transactOpen, setTransactOpen ] = useState(true);
+    const [ miscData, setMiscData ] = useState(null);
+    const [ transactModalOpen, setTransactModalOpen ] = useState(false);
+    const [ transactionData, setTransactionData ] = useState({name:'',address:'',postId:''});
 
 
     const validateEmail = (mail) => {
@@ -54,7 +56,9 @@ export const ClientProvider = ({children}) => {
     
 
     return (
-        <ClientContext.Provider value={{mnemonicModalOpen, setMnemonicModalOpen,signInModalIsOpen, setSignInModalIsOpen,signUpModalIsOpen, setSignUpModalIsOpen,validateEmail,checkPassword,requiredTextLength,handleChange}} >
+        <ClientContext.Provider value={{mnemonicModalOpen, setMnemonicModalOpen,signInModalIsOpen, setSignInModalIsOpen,
+        signUpModalIsOpen, setSignUpModalIsOpen,validateEmail,checkPassword,requiredTextLength,handleChange,miscData, setMiscData,transactModalOpen, setTransactModalOpen,
+        transactionData, setTransactionData }} >
             {children}
         </ClientContext.Provider>
     )

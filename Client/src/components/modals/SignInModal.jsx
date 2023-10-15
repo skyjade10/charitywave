@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { BackendContext } from '../context/BackendContext';
 import { ClientContext } from '../context/ClientContext';
 import { contractAbi, contractAddress } from '../context/constants';
+import { VOYTE_USER, IS_LOGGED_IN } from '../context/stateconstants';
 
 const SiginModal = () => {
 
@@ -32,16 +33,16 @@ const SiginModal = () => {
             
             if(tronLinkConnected){
                 setSignUpLoader(true);
-                console.log('address ',voyteUser.address," password",voyteUser.password);
                 const instance = await window.tronWeb.contract(contractAbi,contractAddress);
                 const login = await instance.login(voyteUser.address,voyteUser.password).call({shouldPollResponse:true});
     
                 
                   if(login.success){
+                    window.localStorage.setItem(VOYTE_USER, JSON.stringify(voyteUser));
+                    window.localStorage.setItem(IS_LOGGED_IN, true);
                     setIsLogged(true);
                     setSignUpLoader(false);
                     setSignInModalIsOpen(false)
-                    console.log(" sign status", login);
                     alert("logged in successfuly")
                   }
             }

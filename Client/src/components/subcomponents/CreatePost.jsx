@@ -8,6 +8,7 @@ import { MdKeyboardArrowDown } from 'react-icons/md'
 
 import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { randomPostId, urlpath } from "../../utils";
 
 import ShortUniqueId from 'short-unique-id';
 
@@ -35,21 +36,30 @@ const CreatePost = () => {
     //checks if the affliation meet the requirements i.e length
     const handleAffliation = (mData) => {
         let {name, value} = mData;
-            
-         if(requiredTextLength(value,100)){
-            setAffiliation((prevState)=>({...prevState, value:value,message:"",isValid:true}));
-            console.log(affiliation);
+        console.log('adding value', value)
+
+         if(value == null && value == ''){
+             console.log('adding address')
+             
+             setAffiliation((prevState)=>({...prevState, value:value,message:"",isValid:true}));
          }else{
-            
-            setAffiliation((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
-            console.log(affiliation);
+
+             if(requiredTextLength(value,100)){
+                setAffiliation((prevState)=>({...prevState, value:value,message:"",isValid:true}));
+                console.log(affiliation);
+             }else{
+                
+                setAffiliation((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+                console.log(affiliation);
+             }
          }
+            
     }
 
     //checks if Caption name meet the requirements i.e length
     const handleCaption = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,31)){
+         if(requiredTextLength(value,100)){
             setCaption((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(caption);
          }else{
@@ -64,22 +74,29 @@ const CreatePost = () => {
     const handleAmount = (mData) => {
         let {name, value} = mData;
         var num = 0;
-            num = parseInt(value);
-         if(requiredTextLength(value,31)){
-            setAmount((prevState)=>({...prevState, value:num,message:"",isValid:true}));
-            console.log(amount);
-         }else{
+
+        if(value != null && value != ''){
             
-            setAmount((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
-            console.log(amount);
-         }
+           num = value;
+
+           if(requiredTextLength(value,31)){
+              setAmount((prevState)=>({...prevState, value:num,message:"",isValid:true}));
+              console.log(amount);
+           }else{
+              
+              setAmount((prevState)=>({...prevState, message:"Character length exceeded (Max is 100 chars)",isValid:false}));
+              console.log(amount);
+           }
+        }
+
+        setAmount((prevState)=>({...prevState, value:num,message:"",isValid:true}));
     }
 
-    const onProfileFileChange = (e) => {
+    const onPostFileChange = (e) => {
 
         console.log(e.target.name);
 
-        let proUrl = "voyte/postimg/" + randomUUID();
+        let proUrl = "postimg/"+ urlpath+ "/" + postid;
         setPostImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:proUrl}));
 
         console.log("Url ",postImgState.fileUrl," Selected file", postImgState.selectedFile);
@@ -101,7 +118,6 @@ const CreatePost = () => {
 
 
     const [ postImgState,setPostImgState ] = useState({selectedFile: null,fileUrl:''});
-    const { randomUUID } = new ShortUniqueId({ length: 10 });
 
 
     const handleFileUpload  = async (e) => {
@@ -110,29 +126,27 @@ const CreatePost = () => {
 
             console.log(e.target.value);
             
-            if(e.target.name == 'postimg'){
+            if(postImgState.selectedFile != null){
+                let imageRef = ref(storage, `${postImgState.fileUrl}`);
+                var upload = await uploadBytes(imageRef,postImgState.selectedFile);
+                console.log(" Profile Image Uploaded",upload);
 
-                if(postImgState.selectedFile != null){
-                    let imageRef = ref(storage, `${postImgState.fileUrl}`);
-                    var upload = await uploadBytes(imageRef,postImgState.selectedFile);
-                    console.log(" Profile Image Uploaded",upload);
+                let getUrl = await getDownloadURL(upload.ref)
+                console.log(" Profile Image downloaded",getUrl);
 
-                    let getUrl = await getDownloadURL(upload.ref)
-                    console.log(" Profile Image downloaded",getUrl);
+                //Show the uploaded image
+                var setImage ='';
+                if( getUrl != '' && getUrl != null){
 
-                    //Show the uploaded image
-                    var setImage ='';
-                    if( getUrl != '' && getUrl != null){
+                    setImage = document.getElementById("postimage");
+                    setImage.src = `${getUrl}`;
+                }else{
 
-                        setImage = document.getElementById("postimage");
-                        setImage.src = `${getUrl}`;
-                    }else{
-
-                        setImage.src = cover;
-                    }
-                  
+                    setImage.src = cover;
                 }
+              
             }
+            
         } catch (error) {
             console.log(error)
         }
@@ -148,10 +162,16 @@ const CreatePost = () => {
     const  [amount, setAmount] = useState({value:null,message:"",isValid:true});
     const  [bio, setBio] = useState({value:null,message:"",isValid:true});
 
-
+    let postid =  randomPostId();
     const navigate = useNavigate();
 
-    
+    const getAff = () => {
+        if(affiliation.value != null && affiliation.value != ''){
+            return affiliation.value
+        }
+
+        return "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"
+    }
 
     const handleSubmit = async () => {
 
@@ -160,17 +180,18 @@ const CreatePost = () => {
        // const mBio = bio.value //string
         //const mCountry = country
 
-        if(!isLoggedIn){
+        if(isLoggedIn){
             console.log("add islogged")
             if(tronLinkConnected){
                 console.log("add tron")
                 try {
-
-                    let postid =  window.tronWeb.fromAscii(randomUUID());
+            
+                    
                     
                     const instance = await window.tronWeb.contract(contractAbi,contractAddress);
+                    console.log("My address ", affiliation.value)
                     const createPost = await instance.addPost(
-                        postid,voyteUser.address,affiliation.value,amount.value,handleByte32(caption.value),handleByte32(bio.value),handleByte32(postImgState.value)
+                        postid,voyteUser.address,voyteUser.password,getAff(),amount.value,caption.value,bio.value,postImgState.fileUrl
                     ).send({
                         feeLimit:400_000_000,
                         callValue:0,
@@ -235,7 +256,7 @@ const CreatePost = () => {
                         <img className=' w-full h-[150px]' src={cover} alt="profile-pic" id="postimage" />
                     </div>
                     <div className="flex flex-col gap-1 justify-center items-center lg:flex-row lg:justify-between lg:items-center text-xs mt-2">
-                        <input type={'file'} name="profileimg" onChange={onProfileFileChange}/>
+                        <input type={'file'} name="profileimg" onChange={onPostFileChange}/>
                         <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="postimg" onClick={handleFileUpload}>Add Image</button>
                     </div>
                 </div>
@@ -255,7 +276,7 @@ const CreatePost = () => {
                 <div className={` ${divClass}`}>
                     <p className={` ${textClass}`}>Amount</p>
                     <p className=" text-xs text-red-600">{amount.message}</p>  
-                    <input name="phone" className={` ${inPutClass}`} onChange={(e)=>{handleAmount(handleChange(e));}}/>
+                    <input name="amount" type={"number"} className={` ${inPutClass}`} onChange={(e)=>{handleAmount(handleChange(e));}}/>
                 </div>
 
                 

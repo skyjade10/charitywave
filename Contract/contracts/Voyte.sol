@@ -74,12 +74,23 @@ contract Voyte is Owner{
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// Users Users Users ////////////////////////////////////////////////////
 
+    modifier hasNoAccount(address user){
+        require(!users[user].exist,"This address already has an account");
+        _;
+    }
+    
+    modifier accessGranted(address _user, string memory password){
+        string memory savedPass = users[_user].password;
+      
+        require(keccak256(abi.encodePacked(savedPass)) == keccak256(abi.encodePacked(password)), "Access not granted, wrong password");
+        _;
+    }
 
     struct User {
         bool exist;
         address user;
         string password;
-        uint256 resetCode;
+        bytes32 resetCode;
     }
     
     uint256 userCounter = 0;
@@ -87,17 +98,17 @@ contract Voyte is Owner{
     mapping(uint256 => address ) addressIndex;
     
     
-    
+    //TODO create modifier if address exist
     // creats a user 
-    event CreateUser (User user, uint time); 
-    function creatUser(address userm, string memory passwordm,uint256 passkey) public returns (bool success ){
+    event CreateUser (address user, uint time); 
+    function creatUser(address userm, string memory passwordm,bytes32 passkey) public returns (bool success ){
         User memory user = User(true,userm,passwordm,passkey);
         users[userm] = user;
         userCounter++;
         
         addressIndex[userCounter] =userm;
         
-        emit CreateUser(user,block.timestamp);
+        emit CreateUser(users[userm].user,block.timestamp);
         
         return true;
     }
@@ -111,6 +122,17 @@ contract Voyte is Owner{
         }
         
         return keccak256(abi.encodePacked(savedPass)) == keccak256(abi.encodePacked(passwordm));
+    }
+    
+    function getPassword(bytes32 passkey,address _user) public view returns (string memory password){
+        if(users[_user].resetCode == passkey){
+            return users[_user].password;
+        }
+        return "none";
+    }
+    
+    function getUserCounter() public view returns (uint256 totalUsers) {
+        return userCounter;
     }
 
     
@@ -150,6 +172,7 @@ contract Voyte is Owner{
         emit DeleteFromUpdateAddressStatus(user, block.timestamp);
     }
     
+    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////PROFILE PROFILE PROFILE//////////////////////////////////////////////
@@ -157,7 +180,7 @@ contract Voyte is Owner{
 //Profile Voyte
 
     modifier hasNoProfile(address user){
-        require(!profiles[user].exists,"This address already has an account");
+        require(!profiles[user].exists,"This address already has profile");
         _;
     }
     
@@ -165,6 +188,8 @@ contract Voyte is Owner{
         require(users[user].exist,"Please create a user account; createUser()");
         _;
     }
+    
+    
 
     struct UserName {
         string firstName;
@@ -174,8 +199,9 @@ contract Voyte is Owner{
     struct Contact {
         bytes32 email;
         bytes32 website;
-        uint256 phone;
+        uint40 phone;
         bytes32 physicalAddress;
+        bytes32 country;
         
     }
 
@@ -185,15 +211,12 @@ contract Voyte is Owner{
         UserName userName;
         Contact Contact;
         string bio;
-        bytes32 country;
-        bytes32 profileImg;
-        bytes32 coverImg;
         bytes32 ProfileType;
         bool isVerified;
 
     }
 
-    uint256 public profileCounter = 0;
+    uint256 profileCounter = 0;
     mapping (address => Profile ) profiles;
     mapping (uint256 => address) profileAddress;
 
@@ -201,30 +224,51 @@ contract Voyte is Owner{
     *   Add a new profile
     *
      */
-    event CreateProfile(address indexed user,uint256 timestamp);
+    event CreateProfile( uint256 timestamp);
 
-    function createProfile(address _user, UserName memory _username, Contact memory _contact,string memory _bio,bytes32 _country, 
-                             bytes32 _profileImg, bytes32  _coverImg, bytes32  _profileType) hasNoProfile(_user) accountCreated(_user)  public returns (bool success){
+    function createProfile(address _user,string memory _password, UserName memory _username, Contact memory _contact,string memory _bio, 
+                              bytes32  _profileType) hasNoProfile(_user) accountCreated(_user) accessGranted(_user,_password)  public returns (bool success){
 
         
         profileCounter ++;
         
-        Profile memory profile = Profile(true,_user,_username,_contact,_bio,_country,_profileImg,_coverImg,_profileType,false);
+        Profile memory profile = Profile(true,_user,_username,_contact,_bio,_profileType,false);
         profiles[_user] = profile;
         profileAddress[profileCounter] = _user;
 
-        emit CreateProfile(_user,block.timestamp);
+        emit CreateProfile(block.timestamp);
+
+        return true;
+
+    }
+    
+    
+    //edit profile
+    
+     function editProfile(address _user,string memory _password, UserName memory _username, Contact memory _contact,string memory _bio, 
+                              bytes32  _profileType) accountCreated(_user) accessGranted(_user,_password)  public returns (bool success){
+
+        
+        profileCounter ++;
+        
+        Profile memory profile = Profile(true,_user,_username,_contact,_bio,_profileType,false);
+        profiles[_user] = profile;
+        profileAddress[profileCounter] = _user;
 
         return true;
 
     }
 
-    function getProfile(address _user) public view returns (Profile memory userAddress) {
+    function getProfile(address _user)  public view returns (Profile memory userAddress) {
         return profiles[_user];
     }
 
     function getProfileAddress(uint256 _index) public view returns (address userAddress) {
         return profileAddress[_index];
+    }
+    
+    function getProfileCounter() public view returns (uint256 totalProfiles){
+        return profileCounter;
     }
 
     /**
@@ -239,6 +283,7 @@ contract Voyte is Owner{
         emit DeleteProfile(user,block.timestamp);
     }
     
+    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////POST POST POST POST//////////////////////////////////////////////////
@@ -250,22 +295,22 @@ contract Voyte is Owner{
 
     struct Post {
         
-        uint256 postId;
+        uint80 postId;
         address mAddress;
         address affliation;
         uint256 minAmounts;
-        bytes32 caption;
-        bytes32 message;
-        bytes32 mediaUrls;
+        string caption;
+        string message;
+        string mediaUrls;
         uint256 dateCreated;
-        uint256 dateModified;
+        
         
     }
 
-    uint256 public postId;
+    uint256 postId = 0;
 
-    mapping (uint256 => address ) postAddressIndex;
-    mapping (address => Post ) posts;
+    mapping (address => uint256 [] ) postAddressIndex;
+    mapping (uint256 => Post ) posts;
 
     
 
@@ -275,20 +320,47 @@ contract Voyte is Owner{
 
     event NewPost(uint256 postId);
 
-    function addPost(uint256 _postId, address _user, address _affiliation, uint256 _minAmount, bytes32 _caption, bytes32 _message, bytes32 _mediaUrl) hasProfile(_user) public returns (bool success){
-        Post memory post = Post(_postId,_user,_affiliation,_minAmount,_caption,_message,_mediaUrl,block.timestamp,block.timestamp);
+    function addPost(uint80 _postId, address _user,string memory _password, address _affiliation, uint256 _minAmount,
+    string memory _caption, string memory _message, string memory _mediaUrl) accessGranted(_user, _password) hasProfile(_user) public returns (bool success){
+        Post memory post = Post(_postId,_user,_affiliation,_minAmount,_caption,_message,_mediaUrl,block.timestamp);
 
-        posts[_user] = (post);
-        postAddressIndex[postId] = _user;
+        posts[postId] = post;
+        postAddressIndex[_user].push(postId);
+        postId++;
+        emit NewPost(postId);
 
-        emit NewPost(postId++);
+        return true;
+    }
+    
+    /**
+     * 
+     * */
+
+    
+    function editPost(uint80 _postId, address _user,string memory _password, address _affiliation, uint256 _minAmount,
+    string memory _caption, string memory _message, string memory _mediaUrl) accessGranted(_user, _password) hasProfile(_user) public returns (bool success){
+        Post memory post = Post(_postId,_user,_affiliation,_minAmount,_caption,_message,_mediaUrl,block.timestamp);
+
+        posts[postId] = post;
 
         return true;
     }
 
 
-    function getUserPost(address user) public view returns (Post memory) {
-        return posts[user];
+    function getUserPost(uint256 _index) public view returns (Post memory) {
+        return posts[_index];
+    }
+
+    function getPostAddressSize(address _user) public view returns (uint256 arraySize) {
+        return postAddressIndex[_user].length ;
+    }
+    
+    function getPostAddressData(address _user) public view returns (uint256[] memory data) {
+        return postAddressIndex[_user];
+    }
+    
+    function getPostCounter() public view returns (uint256 postCounter ){
+        return postId;
     }
 
     /**
@@ -296,136 +368,19 @@ contract Voyte is Owner{
     */
     event DeletePost(uint256 postId);
 
-     function deletePost( address _user,uint256 _postId) hasProfile(_user) public returns (bool success) {
+     function deletePost( address _user, string memory _password ,uint256 _postIndex,uint80 _postId) hasProfile(_user) accessGranted(_user,_password) public returns (bool success) {
          
-        if(posts[_user].postId == _postId){
-            delete posts[_user];
+        if(posts[_postIndex].postId == _postId){
+            delete posts[_postIndex];
             emit DeletePost(_postId);
             return true;
         }
 
         return false;
      }
-     
-     
-    /////make changes to values methods
-    
-    /*
-    
-        //Affliation
-    
-    function setAffliation (address _user, address _affiliation, uint256 _postId, uint256 _postIndex) public returns ( bool success ) {
-        
-        
-        if(groupedPosts[_user][_postIndex].postId == _postId){
-            groupedPosts[_user][_postIndex].affliation = _affiliation;
-            
-            return true;
-        }
-        
-        return false;
-        
-    }
-        // minAmounts;
-   
-    function setMinAmount (address _user, uint256 _minAmount, uint256 _postId, uint256 _postIndex) public returns ( bool success ) {
-        
-     
-        if(groupedPosts[_user][_postIndex].postId == _postId){
-            groupedPosts[_user][_postIndex].minAmounts = _minAmount;
-            
-            return true;
-        }
-        
-        return false;
-        
-    }
-    
-        // caption;
-        
-   
-    function setCaption (address _user, string memory _caption, uint256 _postId, uint256 _postIndex) public returns ( bool success ) {
-        
-    
-        
-        if(groupedPosts[_user][_postIndex].postId == _postId){
-            groupedPosts[_user][_postIndex].caption = _caption;
-            
-            return true;
-        }
-        
-        return false;
-        
-    }
-        // message;
-        
-    
-    function setMessage (address _user, string memory _message, uint256 _postId, uint256 _postIndex) public returns ( bool success ) {
 
-        
-        if(groupedPosts[_user][_postIndex].postId == _postId){
-            groupedPosts[_user][_postIndex].message = _message;
-            
-            return true;
-        }
-        
-        return false;
-        
-    }
-        // mediaUrls;
-        
-
-    function setMedialUrl (address _user, string memory _mediaUrl, uint256 _postId, uint256 _postIndex) public returns ( bool success ) {
-        
-        
-        if(groupedPosts[_user][_postIndex].postId == _postId){
-            groupedPosts[_user][_postIndex].mediaUrls = _mediaUrl;
-            
-            return true;
-        }
-        return false;
-    }
-
-*/
-///////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////// AMOUNT DONATED AMOUNT DONATED AMOUNT DONATED AMOUNT DONATED//////////////////////
-
-    /**
-    *   To keep tracts the amount payed per year and month
-    */
-
-    struct AmountDonated {
-        uint256 postId;
-        address donor;
-        address receiver;
-        uint256 amount;
-        uint256 time;
-    }
-
-    mapping ( uint256 => AmountDonated[] ) public amountDonated;
-
-    event NewAmountDonated (uint256 _PostId );
-
-    function mDonate(uint256 aPostId,address aDonor, address aReceiver, uint256 aAmount, uint256 aTime) hasProfile(aReceiver) public returns (bool success){
-        AmountDonated memory amountDonate = AmountDonated(aPostId,aDonor,aReceiver,aAmount,aTime);
-
-        amountDonated[aPostId].push(amountDonate);
-
-        emit NewAmountDonated(aPostId);
-
-        return true;
-    } 
-
-
-    /**
-    *   send Trx to the post ower
-    *
-    */
-
-     function _sendTrx(address receiver, uint256 amount) internal {
-        payable(address(receiver)).transfer(amount);
-     }
 
 
 }
+
 

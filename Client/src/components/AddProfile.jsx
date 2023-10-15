@@ -8,9 +8,8 @@ import { MdKeyboardArrowDown } from 'react-icons/md'
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-import ShortUniqueId from 'short-unique-id';
-
 import { contractAddress, contractAbi } from '../components/context/constants';
+import {  urlpath  } from "../utils";
 
 const AddProfile = () => {
 
@@ -20,7 +19,7 @@ const AddProfile = () => {
     const handleFirstName = (mData) => {
         let {name, value} = mData;
             
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setFirstName((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(firstName);
          }else{
@@ -33,7 +32,7 @@ const AddProfile = () => {
     //checks if Last name meet the requirements i.e length
     const handleLastName = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setLastName((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(lastName);
          }else{
@@ -46,7 +45,7 @@ const AddProfile = () => {
     //checks if Last name meet the requirements i.e length
     const handleEmail = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setEmail((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(email);
          }else{
@@ -68,7 +67,7 @@ const AddProfile = () => {
     //checks if Home meet the requirements i.e length
     const handleHomeAddress = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setHomeAddress((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(homeAddress);
          }else{
@@ -81,7 +80,7 @@ const AddProfile = () => {
     //checks if Home meet the requirements i.e length
     const handleWebsite = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setWebsite((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(website);
          }else{
@@ -94,7 +93,7 @@ const AddProfile = () => {
     //checks if Home meet the requirements i.e length
     const handleCountry = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setCountry((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(country);
          }else{
@@ -107,7 +106,7 @@ const AddProfile = () => {
     //checks if Home meet the requirements i.e length
     const handleCity = (mData) => {
         let {name, value} = mData;
-         if(requiredTextLength(value,100)){
+         if(requiredTextLength(value,31)){
             setCity((prevState)=>({...prevState, value:value,message:"",isValid:true}));
             console.log(city);
          }else{
@@ -139,7 +138,7 @@ const AddProfile = () => {
             var num = 0;
             num = parseInt(value);
 
-            if(requiredTextLength(value,100)){
+            if(requiredTextLength(value,31)){
                 setContact((prevState)=>({...prevState, value:num,message:"",isValid:true}));
                 console.log(contact);
              }else{
@@ -159,13 +158,12 @@ const AddProfile = () => {
 
     const [ proImgState,setProImgState ] = useState({selectedFile: null,fileUrl:''});
     const [ coverImgState,setCoverImgState ] = useState({selectedFile: null,fileUrl:''});
-    const { randomUUID, sequentialUUID } = new ShortUniqueId({ length: 10 });
 
     const onProfileFileChange = (e) => {
 
         console.log(e.target.name);
 
-        let proUrl = "voyte/profileImg/" + randomUUID();
+        let proUrl = "profileImg/" + urlpath;
         setProImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:proUrl}));
 
         console.log("Url ",proImgState.fileUrl," Selected file", proImgState.selectedFile);
@@ -177,7 +175,7 @@ const AddProfile = () => {
 
         console.log(e.target.name);
         
-        let covUrl = "voyte/coverImg/" + randomUUID();
+        let covUrl = "coverImg/" + urlpath;
         setCoverImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:covUrl}));
 
         console.log("Url ",coverImgState.fileUrl," Selected file", coverImgState.selectedFile);
@@ -190,49 +188,51 @@ const AddProfile = () => {
 
             console.log(e.target.value);
             
-            if(e.target.name == 'profileimg')
-                if(proImgState.selectedFile != null){
-                    let imageRef = ref(storage, `${proImgState.fileUrl}`);
-                    var upload = await uploadBytes(imageRef,proImgState.selectedFile);
-                    console.log(" Profile Image Uploaded",upload);
+            if(proImgState.selectedFile != null){
+                let imageRef = ref(storage, `${proImgState.fileUrl}`);
+                var upload = await uploadBytes(imageRef,proImgState.selectedFile);
+                console.log(" Profile Image Uploaded",upload);
 
-                    let getUrl = await getDownloadURL(upload.ref)
-                    console.log(" Profile Image downloaded",getUrl);
+                let getUrl = await getDownloadURL(upload.ref)
+                console.log(" Profile Image downloaded",getUrl);
 
-                    //Show the uploaded image
-                    var setImage ='';
-                    if( getUrl != '' && getUrl != null){
+                //Show the uploaded image
+                var setImage ='';
+                if( getUrl != '' && getUrl != null){
 
-                        setImage = document.getElementById("profileimage");
-                        setImage.src = `${getUrl}`;
-                    }else{
+                    setImage = document.getElementById("profileimage");
+                    setImage.src = `${getUrl}`;
+                }else{
 
-                        setImage.src = cover;
-                    }
-
-
-                  
+                    setImage.src = cover;
                 }
-            if(e.target.name == 'coverimg')
-                if(proImgState.selectedFile != null){
-                    let imageRefc = ref(storage, `${coverImgState.fileUrl}`);
-                    var uploadn = await uploadBytes(imageRefc,coverImgState.selectedFile);
-                    console.log(" Cover Image Uploaded",uploadn);
+              
+            }
+            // if(e.target.name == 'profileimg'){
 
-                    let getUrl = await getDownloadURL(uploadn.ref);
-                    console.log(" Cover Image downloaded",getUrl);
+            // }
+            if(proImgState.selectedFile != null){
+                let imageRefc = ref(storage, `${coverImgState.fileUrl}`);
+                var uploadn = await uploadBytes(imageRefc,coverImgState.selectedFile);
+                console.log(" Cover Image Uploaded",uploadn);
 
-                    //Show the uploaded image
-                    var setImage = '';
-                    if( getUrl != '' && getUrl != null){
-                        setImage = document.getElementById("coverimage");
-                        setImage.src = `${getUrl}`;
-                    }else{
+                let getUrl = await getDownloadURL(uploadn.ref);
+                console.log(" Cover Image downloaded",getUrl);
 
-                        setImage.src = cover;
-                    }
+                //Show the uploaded image
+                var setImage = '';
+                if( getUrl != '' && getUrl != null){
+                    setImage = document.getElementById("coverimage");
+                    setImage.src = `${getUrl}`;
+                }else{
 
+                    setImage.src = cover;
                 }
+
+            }
+            // if(e.target.name == 'coverimg'){
+
+            // }
         } catch (error) {
             console.log(error)
         }
@@ -241,7 +241,8 @@ const AddProfile = () => {
 
 
     const { tronLinkConnected,isLoggedIn,voyteUser,setVoyteUser,setIsLogged } = useContext(BackendContext);
-    const { validateEmail,checkPassword,requiredTextLength,handleChange} = useContext(ClientContext);
+    const { validateEmail,checkPassword,requiredTextLength,handleChange,setMnemonicModalOpen} = useContext(ClientContext);
+    const [ signUpLoader, setSignUpLoader] = useState(false);
 
     const  [firstName, setFirstName]= useState({value:null,message:'', isValid:true});
     const  [lastName, setLastName] = useState({value:null,message:"",isValid:true});
@@ -252,8 +253,6 @@ const AddProfile = () => {
     const  [profileType, setProfileType] = useState({value:null,message:"",isValid:true});
     const  [country, setCountry] = useState({value:null,message:"",isValid:true});
     const  [city, setCity] = useState({value:null,message:"",isValid:true});
-    const  [profileImg, setProfileImg] = useState({value:null,message:"",isValid:true});
-    const  [coverImg, setCoverImg] = useState({value:null,message:"",isValid:true});
     const  [bio, setBio] = useState({value:null,message:"",isValid:true});
 
     const navigate = useNavigate();
@@ -262,7 +261,6 @@ const AddProfile = () => {
 
     const handleSubmit = async () => {
 
-        const  trW = window.tronWeb;
 
         //username tupple
         const mFirstN =  firstName.value;
@@ -275,23 +273,25 @@ const AddProfile = () => {
         const mWebsite =  handleByte32(website.value);
         const mContact =  contact.value;
         const mHome =  handleByte32(homeAddress.value);
-        const mycontact = [mEmail,mWebsite,mContact,mHome];
+        const mCountry = handleByte32(country.value);
+        const mycontact = [mEmail,mWebsite,mContact,mHome,mCountry];
 
         console.log("contact tuple",mycontact);
 
        // const mBio = bio.value //string
         //const mCountry = country
 
-        if(!isLoggedIn){
+        if(isLoggedIn){
             console.log("add islogged")
             if(tronLinkConnected){
                 console.log("add tron")
                 try {
                     
                     const instance = await window.tronWeb.contract(contractAbi,contractAddress);
+                    setSignUpLoader(true)
                     const signUp = await instance.createProfile(
-                        voyteUser.address,username,mycontact,handleByte32(bio.value),handleByte32(country.value), 
-                        handleByte32(proImgState.fileUrl), handleByte32(coverImgState.fileUrl),handleByte32(profileType.value)
+                        voyteUser.address,voyteUser.password,username,mycontact,bio.value, 
+                        handleByte32(profileType.value)
                     ).send({
                         feeLimit:400_000_000,
                         callValue:0,
@@ -299,10 +299,11 @@ const AddProfile = () => {
                       });
         
                       if(signUp.success){
-                        console.log('');
+                        setSignUpLoader(false)
                         setIsLogged(true);
                         navigate('/profile');
                         setMnemonicModalOpen(false);
+                        alert("account profile created")
                       }
 
                       console.log(signUp);
@@ -353,8 +354,6 @@ const AddProfile = () => {
 
     const handleByte32 = (value) => {
         
-       // setVoyteUser((prevState) => ({...prevState, address:contractAddress}));
-       // console.log("voyte user ",voyteUser)
        console.log("injected",value);
        if(value == null )
             value = ' ';
@@ -370,11 +369,16 @@ const AddProfile = () => {
             console.log("PaddesText",paddText);
             return paddText;
         }
-
-        console.log("holder",value);
-        console.log("b32",b32);
         return value;
         
+    }
+
+    const Loader = (classProps) => {
+        return (
+            <div className=" flex justify-center items-center py-3">
+                <div className={` animate-spin rounded-full h-10 w-10  ${classProps} border-b-4 border-purple-500`}/>
+            </div>
+        )
     }
 
     const inPutClass = " border-2 w-full outline-none p-2 text-sm text-gray-900 border-gray-300 bg-gray-50 rounded-md hover:border-purple-500 focus:border-purple-800";
@@ -390,22 +394,28 @@ const AddProfile = () => {
                     <div className=" m-1 text-sm text-gray-900">
                         <p className=" text-md text-bold ">Cover Image</p>
                         <div className=' w-36 md:me-2 m-1'>
-                            <img className=' w-full h-[150px] aspect-auto' src={cover} alt="cover-pic" id="coverimage" />
+                            <img className=' w-full max-h-[150px] aspect-auto' src={cover} alt="cover-pic" id="coverimage" />
                         </div>
                         <div className="flex flex-row justify-between items-center text-xs mt-2">
                             <input type={'file'} name="coverimg" onChange={onCoverFileChange}/>
-                            <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm"  name="coverimg" onClick={handleFileUpload}>Upload</button>
+                            { <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm"  name="coverimg" onClick={handleFileUpload}>Upload</button> }
                         </div>
                     </div>
+                    { signUpLoader && (<div className=' flex flex-col justify-center items-center z-20 fixed  backdrop-blur-sm h-screen
+                    max-w-[500px] w-5/6 sm:w-[700px] lg:w-[700px] gap-4' id='signUpLoader'>
+                        <p>Please wait this may take a while</p>
+                        <Loader/>
+                        <button className=" hover:bg-purple-400 rounded-md px-4 py-1 bg-purple-600 text-white cursor-pointer" onClick={()=>setSignUpLoader(false)}>cancel</button>
+                        </div>)}
 
                     <div className="  m-1 text-sm text-gray-900">
                         <p className=" text-md text-bold ">Profile Image</p>
                         <div className=' w-36 md:me-2 m-1'>
-                            <img className=' w-full h-[150px]' src={cover} alt="profile-pic" id="profileimage" />
+                            <img className=' w-full max-h-[150px]' src={cover} alt="profile-pic" id="profileimage" />
                         </div>
                         <div className="flex flex-row justify-between items-center text-xs mt-2">
                             <input type={'file'} name="profileimg" onChange={onProfileFileChange}/>
-                            <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="profileimg" onClick={handleFileUpload}>Upload</button>
+                            { <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="profileimg" onClick={handleFileUpload}>Upload</button> }
                         </div>
                     </div>
                     <div className={` ${divClass}`}>

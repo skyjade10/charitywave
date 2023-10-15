@@ -1,5 +1,5 @@
 
-import car from '../../assets/images/used.jpg';
+import car from '../../assets/images/user.png';
 import React, { useContext, useState, useEffect } from 'react';
 import { BackendContext } from '../context/BackendContext';
 
@@ -8,8 +8,9 @@ import {HiUserGroup} from "react-icons/hi";
 import {CgOrganisation} from "react-icons/cg";
 import { Link } from 'react-router-dom';
 
-import { storage } from "../../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from '../../firebase';
+import { ref, getDownloadURL } from 'firebase/storage';
+import { urlpath } from '../../utils';
 import { contractAddress , contractAbi } from '../context/constants';
 
 const PagesCardView = ({data}) => {
@@ -63,7 +64,7 @@ const PagesCardView = ({data}) => {
         if(mData.bio!=null && mData.bio != ""){
             msg = mData.bio;
 
-            return <p className=" min-w-[90vh] min-h-[50px] text-sm text-left text-gray-700">{msg} </p>
+            return <p className=" text-sm text-left text-gray-700">{msg} </p>
         }
     }
 
@@ -76,15 +77,18 @@ const PagesCardView = ({data}) => {
                 return <MdVerified style={minIconStyle}/>
             return <div></div>
     }
-
+    
     //Setting image
     const proImage = () => {
         let vr = car;
-        return vr;
-        //  if(mData.profileImg != null){
-            
-        //     return vr;
-        //  }
+        
+        if(mData != null){
+            if(mData.profileImge != null){
+                vr = "";
+                vr = mData.profileImge;
+                return vr;
+            }
+       }
             
     }
 
@@ -97,13 +101,13 @@ const PagesCardView = ({data}) => {
             org = mData.profileType;
 
             return <div className=" flex text-sm gap-2 items-center">
-                <MdVerified style={minIconStyle}/>
+                <MdGroups2 style={minIconStyle}/>
                 <p className="text-xs">{org} </p>
             </div>
         }
 
         return <div className=" flex text-sm gap-2 items-center">
-                <MdVerified style={minIconStyle}/>
+                <MdGroups2 style={minIconStyle}/>
                 <p className="text-xs">{org} </p>
             </div>
     }
@@ -127,12 +131,12 @@ const PagesCardView = ({data}) => {
     const minIconStyle = {color:"purple"}
 
     return (
-        <Link to={"/profile"}>
+        <Link to={"/profile" } state={mData.mAddress}>
             
-            <div className=' grid grid-cols-[auto,auto] gap-2 justify-center  my-4 border-2 rounded-md p-2 shadow-md'>
+            <div className=' bg-gray-100 grid grid-cols-[auto,auto] gap-2 justify-start  my-4 border-2 rounded-md p-2 shadow-md'>
                 
-                <div className='  w-36 md:me-2'>
-                    <img className=' w-full h-full' src={proImage()} alt="post-profile-pic" id='profileimagec'/>
+                <div className='  w-36 md:me-2 '>
+                    <img className=' w-full h-full max-w-24 max-h-24 ' src={proImage()} alt="" id='profileimagec'/>
                 </div>
                 <div className=' grid grid-row[auto]'>
                     <div className=' flex flex-row items-center justify-between'>
@@ -170,46 +174,99 @@ const Pages = ({props}) => {
         // console.log(profilesData)
      }
 
-
-
-    const myAddress = "TJK1HyqM1XeVe1kY6RKkzwKWSU97hYrNhr";
     const myTronweb = window.tronWeb;
-    var profCounter = 0;
+
+    const [load, setLoad] = useState(false);
+    const [lastIndex, setLastIndex ] = useState(false);
+    const [ perPage, setPerPage ] = useState(4);
+    const [ currentIndex, setCurrentIndex ] = useState(0)
+    const [ initIndex, setInitIndex ] = useState(true)
+
+    let num = 0;
 
     useEffect(() => {
 
         (async () => {
-
             try {
-                
+
                 const instance = await myTronweb.contract(contractAbi,contractAddress);
-                const myProfile = await instance.getProfile(myAddress).call();
-    
-                const mData = {
-                    
-                    mAddress: myTronweb.toUtf8(myProfile.mAddress),
-                    firstName: myProfile.userName.firstName,
-                    lastName: myProfile.userName.lastName,
-                    profileType: myTronweb.toUtf8(myProfile.ProfileType),
-                    email: window.tronWeb.toUtf8(myProfile.Contact.email),
-                    website: myTronweb.toUtf8(myProfile.Contact.website),  
-                    phone: myProfile.Contact.phone,
-                    physicalAddress: myTronweb.toUtf8(myProfile.Contact.physicalAddress),
-                    bio: myTronweb.toUtf8(myProfile.bio), 
-                    country: myTronweb.toUtf8(myProfile.country),
-                    coverImg: myTronweb.toUtf8(myProfile.coverImg),
-                    profileImg: myTronweb.toUtf8(myProfile.profileImg),  
-                    verified: myProfile.isVeried,
-    
+
+                let profileCounter = await instance.getProfileCounter().call();
+                console.log("Counter  ",profileCounter.totalProfiles.toNumber());
                 
-                };
+                let total  = profileCounter.totalProfiles.toNumber()
+
+                if(initIndex){
+
+                    num = currentIndex;
+
+                    for(let i = 0; i < perPage ; i++){
     
-                setPagesData((prevState) => [...prevState,mData])
-                console.log(pagesData)
-                profCounter ++;
+                        setLoad(true);
+                        if(num > total){
+                            setLastIndex(true)
+                            break;
+                        }
+                        setLastIndex(false)
     
-                console.log("my name  ",window.tronWeb.toUtf8(myProfile.bio));
+                        const maDress = await instance.getProfileAddress(1).call();
+                        
+                       
+                        if(myTronweb.isAddress(maDress.userAddress) ){
+                            const myProfile = await instance.getProfile(myTronweb.address.fromHex(maDress.userAddress)).call();
+                           
+                            
+                            if(myProfile.userAddress.userName.firstName != null)
+                            
+                            
+                            if(myProfile.userAddress.userName.firstName != ''){
+                                
+                                var url = ''
+                                try {
+                                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath));
+                                url = profileUrl;
+                                
+                                } catch (error) {
+                                    console.log(error)
+                                }
+                                const mData = {
+                                    
+                                    mAddress: myProfile.userAddress.mAddress,
+                                    firstName: myProfile.userAddress.userName.firstName,
+                                    lastName: myProfile.userAddress.userName.lastName,
+                                    profileType: myTronweb.toUtf8(myProfile.userAddress.ProfileType),
+                                    email: window.tronWeb.toUtf8(myProfile.userAddress.Contact.email),
+                                    website: myTronweb.toUtf8(myProfile.userAddress.Contact.website),  
+                                    phone: myProfile.userAddress.Contact.phone,
+                                    physicalAddress: myTronweb.toUtf8(myProfile.userAddress.Contact.physicalAddress),
+                                    bio:myProfile.userAddress.bio, 
+                                    country: myTronweb.toUtf8(myProfile.userAddress.Contact.country), 
+                                    verified: myProfile.userAddress.isVeried,
+    
+                                    profileImge: url,
+    
+                                    
+                                
+                                };
+                                
+            
+                                setPagesData((prevState) => [...prevState,mData])
+                                console.log(pagesData)
+                                num ++;
+                            }
+                            
+    
+                        }
+    
+                    }
+
+                    setLoad(false);
+                }
+
+                setCurrentIndex(num);
+                
             } catch (error) {
+                setCurrentIndex(num);
                 console.log(error);
             }
             
@@ -217,8 +274,15 @@ const Pages = ({props}) => {
       
         // return () => {
         // };
-    }, []);
+    },[initIndex]);
 
+    const Loader = (classProps) => {
+        return (
+            <div className=" flex justify-center items-center py-3">
+                <div className={` animate-spin rounded-full h-10 w-10  ${classProps} border-b-4 border-purple-500`}/>
+            </div>
+        )
+    }
 
     const profiles =  pagesData.map((items,index)=> {
         if (items == null || items == undefined){
@@ -230,8 +294,12 @@ const Pages = ({props}) => {
     })
 
     return (
-        <div>
+        <div className=' max-h-screen overflow-y-auto px-2'>
             {profiles}
+            <div>
+                { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No more pages</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}
+                
+            </div>
         </div>
     )
 }
