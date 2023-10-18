@@ -90,11 +90,12 @@ const PostCardView = ({data}) => {
     //Setting Media
     const proMedia = () => {
         let vr = proImage();
+        console.log(mData.mediaUrl)
         if(mData != null){
 
-            if(mData.mediaUrls != null && mData.mediaUrls != ""){
+            if(mData.mediaUrl != null && mData.mediaUrl != ""){
                 vr = "";
-                vr = mData.profileImg;
+                vr = mData.mediaUrl;
                 return vr;
             }
         }
@@ -162,7 +163,7 @@ const PostCardView = ({data}) => {
     }
 
     
-    const { setTransactModalOpen,setTransactionData } = useContext(ClientContext)
+    const { setTransactModalOpen,setTransactionData,currentIndex, setCurrentIndex } = useContext(ClientContext)
     const donate = (mpostID,mname,maddress) => {
         console.log("Check t=data",mpostID,mname,maddress);
         setTransactionData((prevState) => ({...prevState,name:mname,address:maddress,postId:mpostID}))
@@ -213,11 +214,11 @@ const PostCardView = ({data}) => {
                     </div>
                     {proMessage()}
                     <hr />
-                    <div className=' flex flex-row  text-xs md:text-xs gap-2 text-gray-500'>
+                    <div className=' flex flex-row items-center  text-xs md:text-xs gap-2 text-gray-500'>
                         {proOrg()}
                         {proLocation()}
-                        <Link to={"/profile" } state={mData.mAddress}>
-                            <div onClick={
+                        <Link  to={"/profile" } state={mData.mAddress}>
+                            <div  onClick={
                                 (e) => { e.stopPropagation()
                                     profileOnclick(e)
                                 }
@@ -251,11 +252,11 @@ const Posts = ({props}) => {
      }
      
 
-     const myTronweb = window.tronWeb;
+     const { currentIndex, setCurrentIndex } = useContext(ClientContext)
      const [load, setLoad] = useState(false);
      const [lastIndex, setLastIndex ] = useState(false);
      const [ perPage, setPerPage ] = useState(4);
-     const currentIndex= useRef(0);
+  
      const [ initIndex, setInitIndex ] = useState(true)
 
      let num = 0;
@@ -265,7 +266,7 @@ const Posts = ({props}) => {
         (async () => {
 
             try {
-                
+                const myTronweb = window.tronWeb;
 
                 const instance = await myTronweb.contract(contractAbi,contractAddress);
 
@@ -275,8 +276,8 @@ const Posts = ({props}) => {
 
                 if(initIndex){
 
-                    console.log("Current index", currentIndex.current)
-                    num = currentIndex.current;
+                    console.log("Current index", currentIndex)
+                    num = currentIndex;
 
                     for(let i = 0; i < perPage; i++){
 
@@ -289,11 +290,11 @@ const Posts = ({props}) => {
     
                         const mPosts = await instance.getUserPost(num).call();
                         const myProfile = await instance.getProfile(myTronweb.address.fromHex(mPosts.mAddress)).call();
-                        const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath));
+                        const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath(window)));
                        
                         let url = ''
                         try {
-                            const getMediaUrl = await getDownloadURL(ref(storage,"postimg/"+ urlpath + "/" + mPosts.postId));
+                            const getMediaUrl = await getDownloadURL(ref(storage,"postimg/"+ urlpath(window) + "/" + mPosts.postId));
                             url = getMediaUrl
                         } catch (error) {
                             console.log(error)
@@ -328,7 +329,7 @@ const Posts = ({props}) => {
 
                         
                         num ++;
-                        currentIndex.current = num
+                        setCurrentIndex(num)
                     }
 
                     setLoad(false);
@@ -336,7 +337,7 @@ const Posts = ({props}) => {
                 }
 
                 console.log("set num",num)
-                currentIndex.current = num
+                setCurrentIndex(num)
 
                 
                 
@@ -376,7 +377,7 @@ const Posts = ({props}) => {
             {posts }
             
             <div>
-                { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No more posts</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}
+                { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No posts</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}
                 
             </div>
         </div>

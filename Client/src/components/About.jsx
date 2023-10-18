@@ -70,9 +70,9 @@ const About = () => {
                         <h2>ABOUT</h2>
                 </div>
                 <div className="flex-initial items-start text-gray-800">
-                    
+                    <p>Charitywave stands as a beacon of hope in the realm of philanthropy, pioneering a revolutionary approach to giving through its decentralized donation and contribution platform. With its innovative technology, Charitywave empowers individuals and organizations worldwide to make a tangible difference in the lives of those in need. By eliminating intermediaries and leveraging blockchain technology, this platform ensures that every donation directly reaches its intended cause, maximizing the impact of charitable acts. Through Charitywave, the spirit of generosity transcends boundaries, fostering a global community dedicated to creating positive change. As a trailblazer in decentralized charity, Charitywave exemplifies the future of giving, where transparency, efficiency, and compassion converge to transform the world, one donation at a time.</p>
                 </div>
-
+                <div className=" my-5"></div>
                 <div ref={scrollRef} className=" font-bold border-b-2 w-3/4 text-center" id="terms">
                     <h2><b>TERMS AND CONDITIONS ("Terms")</b></h2>
                 </div>
@@ -235,16 +235,20 @@ const About = () => {
                     <p>We reserve the right, at Our sole discretion, to modify or replace these Terms at any time. If a revision is material We will make reasonable efforts to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at Our sole discretion.</p>
 
                     <p>By continuing to access or use Our Service after those revisions become effective, You agree to be bound by the revised terms. If You do not agree to the new terms, in whole or in part, please stop using the website and the Service.</p>
-                    <h5><b>Contact Us</b></h5>
-
-                    <p>If you have any questions about these Terms and Conditions, You can contact us:</p>
-
 
 
                 </div>
-
+                <div className=" my-5"></div>
                 <div ref={scrollRef} className=" font-bold border-b-2 w-3/4 text-center" id="contact">
                     <h2><b>CONTACT</b></h2>
+                </div>
+                <div>
+
+                    <h5><b>Contact Us</b></h5>
+
+                    <p>If you have any questions about these Terms and Conditions , You can contact us:</p>
+                    <p>nzambwe@gmail.com</p>
+
                 </div>
                 
 

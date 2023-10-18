@@ -10,8 +10,9 @@ import { Link } from 'react-router-dom';
 
 import { storage } from '../../firebase';
 import { ref, getDownloadURL } from 'firebase/storage';
-import { urlpath } from '../../utils';
+import { urlpath, ecodeAddress } from '../../utils';
 import { contractAddress , contractAbi } from '../context/constants';
+import { ClientContext } from '../context/ClientContext';
 
 const PagesCardView = ({data}) => {
 
@@ -131,7 +132,7 @@ const PagesCardView = ({data}) => {
     const minIconStyle = {color:"purple"}
 
     return (
-        <Link to={"/profile" } state={mData.mAddress}>
+        <Link to={`/${ecodeAddress(window,mData.mAddress)}` }>
             
             <div className=' bg-gray-100 grid grid-cols-[auto,auto] gap-2 justify-start  my-4 border-2 rounded-md p-2 shadow-md'>
                 
@@ -174,12 +175,12 @@ const Pages = ({props}) => {
         // console.log(profilesData)
      }
 
+    const {currentIndexPages, setCurrentIndexPages} = useContext(ClientContext)
     const myTronweb = window.tronWeb;
 
     const [load, setLoad] = useState(false);
     const [lastIndex, setLastIndex ] = useState(false);
     const [ perPage, setPerPage ] = useState(4);
-    const [ currentIndex, setCurrentIndex ] = useState(0)
     const [ initIndex, setInitIndex ] = useState(true)
 
     let num = 0;
@@ -198,7 +199,7 @@ const Pages = ({props}) => {
 
                 if(initIndex){
 
-                    num = currentIndex;
+                    num = currentIndexPages;
 
                     for(let i = 0; i < perPage ; i++){
     
@@ -223,7 +224,7 @@ const Pages = ({props}) => {
                                 
                                 var url = ''
                                 try {
-                                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath));
+                                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath(window)));
                                 url = profileUrl;
                                 
                                 } catch (error) {
@@ -263,10 +264,10 @@ const Pages = ({props}) => {
                     setLoad(false);
                 }
 
-                setCurrentIndex(num);
+                setCurrentIndexPages(num);
                 
             } catch (error) {
-                setCurrentIndex(num);
+                setCurrentIndexPages(num);
                 console.log(error);
             }
             
@@ -297,7 +298,7 @@ const Pages = ({props}) => {
         <div className=' max-h-screen overflow-y-auto px-2'>
             {profiles}
             <div>
-                { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No more pages</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}
+                { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No pages</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}
                 
             </div>
         </div>

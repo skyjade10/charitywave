@@ -160,12 +160,16 @@ const NavBar = () => {
         navigate('/search');
     }
 
+    const creatPost = () => {
+        navigate("/creatpost");
+    }
+
     const iconsStyle = {color:theme.purple, fontSize: "2.0em"}
     const iconClass = " p-1 hover:bg-gray-300 active:bg-zinc-400 cursor-pointer"
     return (
-        <nav className='fixed z-20 mb-10 w-full px-8 p-1 flex flex-row justify-between items-center border-b-2 bg-white'>
+        <nav className='fixed z-20 mb-10 w-full sm:px-4 md:px-5 lg:px-8 p-1 flex flex-row justify-between items-center border-b-2 bg-white'>
             <Link to={"/"}>
-                <div className=' mx-2  w-24 cursor-pointer'>
+                <div className=' ms-2 md:mx-2  w-24 cursor-pointer'>
                     {/* <img src={logo} alt="logo" /> */<p className=' text-[#7A306C] font-bold text-lg'>CharityWave</p>}
                 </div>
             </Link>
@@ -179,7 +183,7 @@ const NavBar = () => {
                 </div>
             )}
             
-            <ul className='flex gap-4 items-center'>
+            <ul className='hidden md:flex gap-4 items-center'>
                 <li className={` ${iconClass}  `} onClick={()=>{
                     searchToggle?setSearchToggle(false): setSearchToggle(true)
                 }}>{/*<CgSearch style={iconsStyle}/>*/}</li>
@@ -189,13 +193,19 @@ const NavBar = () => {
                     }} className={` ${iconClass}`}>{<MdMenu style={iconsStyle}/>}</li>
             </ul>
 
+            <ul className=' md:hidden '>
+                <li  onClick={()=>{
+                        menuToggle?setMenuToggle(false):setMenuToggle(true)
+                        }} className={` ${iconClass}`}>{<MdMenu style={iconsStyle}/>}</li>
+            </ul>
+
             {menuToggle &&
             (
                 <div className=' fixed bg-gray-200  w-[250px] top-14 p-2 flex flex-col gap-1 end-0 border-2 rounded-sm'>
                     
                     {!walletConnected &&(
                         <div>
-                            <button className=' border-2 border-blue-600 rounded-s-full rounded-e-full
+                            <button className=' w-5/6 border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={connectWalletOnclick}>Connect Wallet</button>
                         
                         </div>
@@ -203,14 +213,14 @@ const NavBar = () => {
 
                     {!isLoggedIn &&(
                         <div>
-                            <button className=' border-2 border-blue-600 rounded-s-full rounded-e-full
+                            <button className=' w-5/6 border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 mb-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={SignUpclick}>Sign Up</button>
                         
                         </div>
                     )}
                     {!isLoggedIn &&(
                         <div>
-                            <button className=' border-2 border-blue-600 rounded-s-full rounded-e-full
+                            <button className=' w-5/6 border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 mb-4 mx-5 text-gray-700 hover:bg-gray-300' onClick={SignInclick}>Login</button>
                         
                         </div>
@@ -218,7 +228,10 @@ const NavBar = () => {
 
 
                     <hr className=' border-gray-400'/>
-
+                    <div className=" md:hidden flex flex-col gap-2 m-2 ">
+                        <button className="w-5/6 shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4  text-white rounded-full cursor-pointer self-center"
+                        onClick={creatPost}>Donate Post</button>
+                    </div>
                     {<MenuItems icon={<CgProfile style={menuIconsStyle} />} title="My Profile" menuOnClick={profileOnclick}/>}
                     {<MenuItems icon={<MdOutlineListAlt style={menuIconsStyle }/>} title="Post" menuOnClick={()=> navigate('/post')}/>}
                     {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="Pages" menuOnClick={()=> navigate('/pages')}/>}
@@ -228,7 +241,7 @@ const NavBar = () => {
                     {isLoggedIn && (
                         <div>
                             <hr className=' border-gray-400'/>
-                            <button className={` bg-[${theme.purple}] border-2 border-blue-600 rounded-s-full rounded-e-full
+                            <button className={`w-5/6 bg-[${theme.purple}] border-2 border-blue-600 rounded-s-full rounded-e-full
                             px-4 py-1 my-4 mx-5 text-gray-700 hover:bg-gray-300`} onClick={signOut}>Sign Out</button>
                         </div>
                     )}

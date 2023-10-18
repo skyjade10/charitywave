@@ -239,11 +239,11 @@ const PostDetail = () => {
                 const mPost = await instance.getUserPost(postindex).call();
 
                 const myProfile = await instance.getProfile(myTronweb.address.fromHex(mPost.mAddress)).call();
-                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath));
+                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath(window)));
 
                 let url = ''
                 try {
-                    const mediaUrl = await getDownloadURL(ref(storage,"postimg/"+ urlpath + "/" + mPost.postId));
+                    const mediaUrl = await getDownloadURL(ref(storage,"postimg/"+ urlpath(window) + "/" + mPost.postId));
                     url = mediaUrl
                 } catch (error) {
                     console.log(error)

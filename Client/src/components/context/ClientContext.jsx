@@ -13,6 +13,16 @@ export const ClientProvider = ({children}) => {
     const [ transactionData, setTransactionData ] = useState({name:'',address:'',postId:''});
 
 
+    //post states
+    const [ currentIndex, setCurrentIndex ] = useState(0)
+    const [ initIndex, setInitIndex ] = useState(true)
+
+    //page states
+    const [ currentIndexPages, setCurrentIndexPages ] = useState(0)
+    const [ initIndexPages, setInitIndexPages ] = useState(true)
+
+    //pages states
+
     const validateEmail = (mail) => {
         if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)){
             console.log("meets the requirements");
@@ -58,7 +68,7 @@ export const ClientProvider = ({children}) => {
     return (
         <ClientContext.Provider value={{mnemonicModalOpen, setMnemonicModalOpen,signInModalIsOpen, setSignInModalIsOpen,
         signUpModalIsOpen, setSignUpModalIsOpen,validateEmail,checkPassword,requiredTextLength,handleChange,miscData, setMiscData,transactModalOpen, setTransactModalOpen,
-        transactionData, setTransactionData }} >
+        transactionData, setTransactionData,currentIndex, setCurrentIndex,currentIndexPages, setCurrentIndexPages }} >
             {children}
         </ClientContext.Provider>
     )

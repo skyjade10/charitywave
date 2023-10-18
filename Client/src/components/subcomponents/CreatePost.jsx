@@ -246,7 +246,7 @@ const CreatePost = () => {
     const textClass = " font-bold text-sm mt-2";
     const divClass = " flex flex-col justify-center items-start ";
     return (
-        <div className=" w-[56vw] bg-gray-50 flex flex-col justify-center items-center border-2 rounded-lg shadow-md m-4 gap-4 ">
+        <div className=" bg-gray-50 flex flex-col justify-center items-center border-2 rounded-lg shadow-md m-4 gap-4 ">
             <div className=" mt-4 font-bold border-b-2 w-3/4 mx-4 pb-2">
                 <h2>Creating Post</h2>
             </div>

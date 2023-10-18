@@ -27,8 +27,8 @@ const Welcome = () => {
     const { getVoyteContract,tronLinkIsConnected,connectWallet,currentAccount } = useContext(BackendContext);
 
     return (
-        <div className=" object-contain mb-0">
-            <div className=" lg:h-[600px]">
+        <div className=" mb-0 ">
+            <div className="h-[300px] lg:h-[600px]">
                 <img className=" w-full h-full" src={mainImage} alt="main" />
             </div>
             <div className="absolute mx-8 top-10 mt-10 sm:top-20 sm:mt-40 md:top-20 md:mt-40 lg:top-40 text-white flex flex-col gap-4">
@@ -63,7 +63,7 @@ const Welcome = () => {
                     <div className="  lg:w-[500px]">
                         <img className=" w-full h-full" src={tap} alt="main" />
                     </div>
-                    <p className=" text-end">
+                    <p className=" text-start md:text-end lg:text-end">
                     Time is a precious gift. Volunteering builds communities. Skills shared teach, heal, uplift. From teaching kids to coding for nonprofits, every contribution adds value. It's not just about money; it's about heart. Volunteer. Make a difference.
                     </p>
                 </div>

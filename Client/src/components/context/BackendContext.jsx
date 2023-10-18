@@ -70,7 +70,11 @@ export const BackendProvider = ({children}) => {
     const connectWallet = async () => {
      
         try {
-            if(!window.tron) return alert("Connect Tron link");
+            if(!window.tron){
+                alert("Connect Tron link");
+                return false;
+            } 
+                
 
             if(tronLinkIsConnected){
 

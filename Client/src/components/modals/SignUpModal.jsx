@@ -38,7 +38,7 @@ const SignUpModal = () => {
         
         console.log("sign up modal ", value);
 
-         if(requiredTextLength(value,30)){
+         if(requiredTextLength(value,150)){
             setPasswordStatus((prevState) => ({...prevState, message:"",isValid:true}));
             setSignUpData((prevState) => ({...prevState, password:value}));
             if(checkPassword(value)){
@@ -48,7 +48,7 @@ const SignUpModal = () => {
                 setPasswordStatus((prevState) => ({...prevState, message:"Password must contain number characters",isValid:false}));
             }
          }else{
-            setPasswordStatus((prevState) => ({...prevState, message:"Character length exceeded (Max is 30 chars)",isValid:true}));
+            setPasswordStatus((prevState) => ({...prevState, message:"Character length exceeded (Max is 150 characters)",isValid:true}));
          }
 
         
@@ -108,6 +108,8 @@ const SignUpModal = () => {
         if(tronLinkConnected){
             setSignUpLoader(true);
 
+            const signUpInfo = document.getElementById('signup-info');
+
             try {
                 
 
@@ -121,7 +123,6 @@ const SignUpModal = () => {
                     shouldPollResponse:true
                 });
    
-                console.log(signUp);
                   if(signUp.success){
                       setVoyteUser((prevState) => ({...prevState,address:signUpData.address,password:signUpData.password}))
                       setIsLogged(true);
@@ -130,10 +131,19 @@ const SignUpModal = () => {
                       window.localStorage.setItem(IS_LOGGED_IN, true);
                       setSignUpLoader(false);
                       setMiscData((prevState) => ({...prevState,data:mnemonic}));
-                      setMnemonicModalOpen(true);
-                      setSignUpModalIsOpen(false);
-                       
-                }
+
+                      signUpInfo.classList.remove('hidden')
+                      signUpInfo.innerText = "Thank you for creating an account with us"
+                      setTimeout(() => {
+                        
+                          setMnemonicModalOpen(true);
+                          setSignUpModalIsOpen(false);
+                      }, 2000);
+                    
+                    }else{
+                        signUpInfo.classList.remove('hidden')
+                        signUpInfo.innerText = "This address already has an account"
+                    }
             } catch (error) {
                 console.log(error);
                 setSignUpLoader(false);
@@ -157,13 +167,14 @@ const SignUpModal = () => {
     <div className='backdrop-blur-sm z-10 absolute w-full h-full bg-gray-500/50 flex justify-center items-center ease-in-out duration-1000' >
         { signUpLoader && (<div className=' flex flex-col justify-center items-center z-20 absolute  backdrop-blur-sm h-[340px] 
          max-w-[500px] w-5/6 sm:w-[700px] lg:w-[700px]' id='signUpLoader'><Loader/></div>)}
-        <div className=' max-w-[500px] w-5/6 sm:w-[700px] lg:w-[700px] bg-white px-4 rounded-md shadow-md ease-in' onClick={
+        <div className=' max-w-[500px] w-10/12 sm:w-9/12 md:w-[400px] lg:w-[400px] bg-white px-4 rounded-md shadow-md ease-in' onClick={
             (e) => { e.stopPropagation()}
         }>
             <div className='flex flex-initial justify-end items-center'>
                 <p className=' w-7 border-2 p-1 m-2 font-bold text-center rounded-sm shadow-sm cursor-pointer
                  hover:bg-gray-300' onClick={() => {setSignUpModalIsOpen(false)}}>x</p>
             </div>
+            <p className='bg-gray-100 text-gray' id='signup-info'></p>
             <p className=' text-sm'>Requires TronLink to Sign Up</p>
             <div className={` flex flex-col justify-center gap-1 items-start `}>
                 <p className={` font-bold text-sm mt-2 text-gray-700`}>Address</p>

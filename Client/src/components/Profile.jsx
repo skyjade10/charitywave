@@ -286,6 +286,8 @@ const Profile = () => {
 
     }
 
+   // Navigate('/post')
+
     const [loading,setLoading ] = useState(false);
     const myTronweb = window.tronWeb;
     useEffect(() => {
@@ -294,12 +296,13 @@ const Profile = () => {
 
             try {
 
-                const userAddress = decodePath(routeParams.user_address);
+                const profileAddress = routeParams.user_address;
+                const userAddress = decodePath(window,routeParams.user_address);
                 
                 const instance = await myTronweb.contract(contractAbi,contractAddress);
                 const myProfile = await instance.getProfile( window.tronWeb.address.fromHex(userAddress)).call();
-                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath));
-                const coverUrl = await getDownloadURL(ref(storage,"coverImg/"+urlpath));
+                const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath(window)));
+                const coverUrl = await getDownloadURL(ref(storage,"coverImg/"+urlpath(window)));
 
                 var mmData = null;
                 //setProfileData(myProfile);
@@ -338,7 +341,7 @@ const Profile = () => {
                
             } catch (error) {
                 alert('something went wrong')
-                Navigate('/post')
+                
                 console.log(error);
             }
             
@@ -354,7 +357,7 @@ const Profile = () => {
         <div className="fixed flex w-full  h-8 justify-end items-center m-4">
             
             {/* <MdArrowBack style={iconStyle}/> */}
-            <Link to={`/${ecodeAddress(voyteUser.address)}/editprofile`} state={profileData} >
+            <Link to={`/${ecodeAddress(window,voyteUser.address)}/editprofile`} state={profileData} >
                 <button className=" text-white shadow-md py-1 px-4 me-10 text-sm bg-purple-900 rounded-s-full rounded-e-full hover:bg-purple-800 "> Edit Profile</button>
             </Link>
         </div>
