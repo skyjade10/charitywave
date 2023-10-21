@@ -73,6 +73,7 @@ const PostCardView = ({data}) => {
     }
 
     //Setting image
+    /*
     const proImage = () => {
         let vr = car;
 
@@ -87,7 +88,10 @@ const PostCardView = ({data}) => {
         return vr;
     }
 
+    */
+
     //Setting Media
+    /*
     const proMedia = () => {
         let vr = proImage();
         console.log(mData.mediaUrl)
@@ -99,10 +103,10 @@ const PostCardView = ({data}) => {
                 return vr;
             }
         }
-         
-
         return vr;
     }
+
+    */
 
     //Setting profile status
     const minIconStyle = {color:"purple"}
@@ -164,9 +168,11 @@ const PostCardView = ({data}) => {
 
     
     const { setTransactModalOpen,setTransactionData,currentIndex, setCurrentIndex } = useContext(ClientContext)
-    const donate = (mpostID,mname,maddress) => {
+    const [ profilePreloadImg, setProfilePreloadImg ] = useState({image:''})
+    const [ mediaPreloadImg, setMediaPreloadImg ] = useState({image:''})
+    const donate = (mpostID,mname,maddress,minmount) => {
         console.log("Check t=data",mpostID,mname,maddress);
-        setTransactionData((prevState) => ({...prevState,name:mname,address:maddress,postId:mpostID}))
+        setTransactionData((prevState) => ({...prevState,name:mname,address:maddress,postId:mpostID,minAmount:minmount}))
     }
 
     const menuStyle = {color:"gray", fontSize:"2.0em"}
@@ -181,12 +187,47 @@ const PostCardView = ({data}) => {
         console.log("My id", getId());
     }
 
+    const preloadImg = () => {
+        const img = new Image();
+        img.src = mData.profileImg;
+        img.onload = () => {
+            setProfilePreloadImg((prevState) => ({...prevState,image:img}) );
+            console.log("image loaded");
+        }
+
+        img.onerror = () => {
+            console.log(error);
+        }
+    }
+
+    const preloadCoverImg = () => {
+        const img = new Image();
+        img.src = mData.mediaUrl;
+        img.onload = () => {
+            setMediaPreloadImg((prevState) => ({...prevState,image:img}) );
+            console.log("image loaded");
+        }
+
+        img.onerror = () => {
+            setMediaPreloadImg((prevState) => ({...prevState,image:profilePreloadImg.image}) );
+
+            console.log("error");
+        }
+    }
+
+    useEffect(()=> {
+    
+        preloadImg();
+        preloadCoverImg();
+
+    },[]);
+
     return (
         <div className=" bg-white mb-2 p-2 cursor-pointer border-2 justify-items-stretch rounded-md shadow-md" name="zana post" key={getId} onClick={(e)=>{cardViewHandleClick(e)}}>
             <div className="mb-2 flex flex-row justify-between pe-4 w-full ">
                 <div className=' flex flex-row justify-center items-center gap-1 cursor-pointer'>
                     <div className=' w-10  md:me-2 '>
-                        <img className=' w-full h-full ' src={proImage()} alt="post-profile-pic" />
+                        <img className=' w-full h-full ' src={profilePreloadImg.image.src} alt="" />
                     </div>
                     <h5 className=' font-bold'>{proName()}</h5>
                     {proVeried()}
@@ -197,8 +238,8 @@ const PostCardView = ({data}) => {
             </div>
             <div className=' grid grid-cols-[auto,auto] justify-start gap-2 w-full'>
             
-                <div className=' w-36 md:me-2'>
-                    <img className=' w-full h-full' src={proMedia()} alt="post-profile-pic" />
+                <div className=' w-36 md:me-2 bg-gray-200'>
+                    {<img className=' w-full h-full' src={mediaPreloadImg.image.src} alt="" />}
                 </div>
                 <div className=' grid grid-row[auto]'>
                     <div className = " w-full ow-span-full">
@@ -208,7 +249,7 @@ const PostCardView = ({data}) => {
                             {proCaption()}
                             <button className=' px-4 py-1 bg-purple-800 text-white  rounded-s-full rounded-e-full text-sm' onClick={() => {
                                 setTransactModalOpen(true); 
-                                donate(getId(),proName(),mData.address);
+                                donate(getId(),proName(),mData.address,mData.minAmount);
                                 }}>donate</button>
                         </div>
                     </div>
@@ -217,7 +258,7 @@ const PostCardView = ({data}) => {
                     <div className=' flex flex-row items-center  text-xs md:text-xs gap-2 text-gray-500'>
                         {proOrg()}
                         {proLocation()}
-                        <Link  to={"/profile" } state={mData.mAddress}>
+                        <Link  to={`/${ecodeAddress(window,mData.mAddress)}`} >
                             <div  onClick={
                                 (e) => { e.stopPropagation()
                                     profileOnclick(e)

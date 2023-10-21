@@ -48,8 +48,8 @@ const SiginModal = () => {
                         setIsLogged(true);
                         signInInfo.classList.remove("hidden");
                         signInInfo.innerText = "Login Successffully"
+                        setSignUpLoader(false);
                         setTimeout(() => {
-                            setSignUpLoader(false);
                             setSignInModalIsOpen(false)
                         }, 3000);
                       }else{
@@ -71,6 +71,10 @@ const SiginModal = () => {
             if(error.code == "INVALID_ARGUMENT"){
                 signInInfo.classList.remove("hidden");
                 signInInfo.innerText = "Please connect wallet"
+            }
+            if(error.message == 'Network Error'){
+                signInInfo.classList.remove("hidden");
+                signInInfo.innerText = "Please check your connection"
             }
         }
     }

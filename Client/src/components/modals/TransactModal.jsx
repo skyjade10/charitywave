@@ -3,20 +3,34 @@ import React, { useContext, useState,useEffect } from 'react';
 import { BackendContext } from '../context/BackendContext';
 import { ClientContext } from '../context/ClientContext';
 import { InfoModal } from "../../components"
+import { async } from '@firebase/util';
 
 const TransactModal = () => {
 
     const { voyteUser, setVoyteUser,tronLinkConnected } = useContext(BackendContext);
     const { setSignInModalIsOpen,handleChange,setTransactModalOpen,transactionData } = useContext(ClientContext);
-    const [transactInfo, setTransactInfo ] = useState({});
+    const [transactInfo, setTransactInfo ] = useState({amount:0});
     
-    const handleCountry = (mData) => {
+    const handleAmount = (mData) => {
         let {name, value} = mData;
 
-        setVoyteUser((prevState)=>({...prevState, address:currentAccount.base58,password:value}));
-        
-    }
+        console.log(value)
+        if(value != null && value > 0){
 
+            let mValue = value*1000000
+            setTransactInfo((prevState)=>({...prevState, amount:mValue}));
+        }
+    }
+    
+    const getMiniAmount = () => {
+        if(transactionData != null){
+            if(transactionData.minAmount != null){
+                return transactionData.minAmount*1000000
+            }
+        }
+
+        return 0
+    }
     const getName = () => {
         if(transactionData != null){
             return transactionData.name
@@ -33,25 +47,49 @@ const TransactModal = () => {
     }
     const getAddress = () => {
         if(transactionData != null){
+            console.log(transactInfo.amount)
             return window.tronWeb.address.fromHex(transactionData.address)
+            //return window.tronWeb.address.toHex("TYKNuXd6RbCM1gpD6rE67DUELbVvaJj394")
         }
 
         return ''
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
 
         try {
 
-            console.log(transactionData)
-            window.tronWeb.transactionBuilder.sendTrx(getAddress(), 2000);
+            
+            let tronweb = window.tronWeb
+            let amount = getMiniAmount() + transactInfo.amount
+            console.log("amoutn",amount)
             //setTransactModalOpen(false);
+            
+            console.log("getmin",getMiniAmount())
+            if (tronweb && tronweb.defaultAddress.base58) {
+                let tx = await tronweb.trx.sendTransaction("TYKNuXd6RbCM1gpD6rE67DUELbVvaJj394", amount)
+               // let signedTx = await tronweb.trx.sign(tx)
+              //  console.log(tx);
+                //console.log(signedTx);
+                
+            }
         } catch (error) {
-            console.log()
+            console.log(error)
         }
 
         return <InfoModal data ={"hello"}/>;
     }
+
+    useEffect(()=>{
+
+        if(transactionData != null){
+            if(transactionData.minAmount > 0){
+                const mAmount  = document.getElementsByName('mini-amount');
+                mAmount.classList.remove('hidden')
+            }
+        }
+
+    },[]);
 
 
   return (
@@ -71,13 +109,23 @@ const TransactModal = () => {
                 <p className=' text-sm text-gray-700'>{getAddress()}</p>
                 <p className=' text-sm text-gray-700 font-bold'>Post ID</p>
                 <p className=' text-sm text-gray-700 '>{getId()}</p>
+                <div name="mini-amount" className='hidden flex-col items-start'>
+                    <p className=' text-sm text-gray-700 font-bold'>Mini Amount</p>
+                    <p className=' text-sm text-gray-700 '>{getMiniAmount()} Trx</p>
+                </div>
             </div>
             <div className={` flex flex-col justify-center gap-1 `}>
                 <p className={` font-bold text-sm mt-2 text-gray-700 px-2 justify-start`}>Amount</p>
                 <p className=" text-xs text-red-600"></p> 
                 <div className=' w-full flex flex-row justify-center items-center gap-2 px-2'>
-                    <input type={'number'} name="country" className={` border-2 w-full outline-none p-2 text-sm text-gray-900
-                    border-gray-300 bg-gray-50 rounded-md hover:border-purple-500 focus:border-purple-800`} onChange={(e)=>{handleSubmit(handleChange(e));}}/>
+                    <div className='flex flex-row w-full justify-center items-center border-2  border-gray-300 bg-gray-50 rounded-md hover:border-purple-500 focus:border-purple-800'>
+                        <div name="mini-amount" className='hidden flex-row justify-center items-center'>
+                            <p className='ms-2'>h </p>
+                            <p className=' ms-2'> +</p>
+                        </div>
+                        <input autocomplete="off" type='number' name="country" className={`  w-full outline-none p-2 text-sm text-gray-900
+                        `} onChange={(e)=>{handleAmount(handleChange(e));}}/>
+                    </div>
                     <p className=' text-sm text-gary-700 font-semibold px-2'>Trx</p>
                 </div>
             </div>

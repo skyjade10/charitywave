@@ -10,7 +10,7 @@ export const ClientProvider = ({children}) => {
     const [ mnemonicModalOpen, setMnemonicModalOpen ] = useState(false);
     const [ miscData, setMiscData ] = useState(null);
     const [ transactModalOpen, setTransactModalOpen ] = useState(false);
-    const [ transactionData, setTransactionData ] = useState({name:'',address:'',postId:''});
+    const [ transactionData, setTransactionData ] = useState({name:'',address:'',postId:'',minAmount:0});
 
 
     //post states
@@ -59,7 +59,6 @@ export const ClientProvider = ({children}) => {
         let value = e.target.value;
         let name = e.target.name;
 
-        console.log(name,value);
         return {name,value};
     }
 

@@ -79,7 +79,7 @@ const CreatePost = () => {
             
            num = value;
 
-           if(requiredTextLength(value,31)){
+           if(requiredTextLength(value,1000)){
               setAmount((prevState)=>({...prevState, value:num,message:"",isValid:true}));
               console.log(amount);
            }else{

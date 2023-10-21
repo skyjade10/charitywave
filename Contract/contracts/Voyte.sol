@@ -101,7 +101,7 @@ contract Voyte is Owner{
     //TODO create modifier if address exist
     // creats a user 
     event CreateUser (address user, uint time); 
-    function creatUser(address userm, string memory passwordm,bytes32 passkey) public returns (bool success ){
+    function creatUser(address userm, string memory passwordm,bytes32 passkey) hasNoAccount(userm) public returns (bool success ){
         User memory user = User(true,userm,passwordm,passkey);
         users[userm] = user;
         userCounter++;

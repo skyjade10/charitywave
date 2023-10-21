@@ -118,6 +118,40 @@ const PostDetailCard = ({data}) => {
         }
     }
 
+    const preloadImg = () => {
+        console.log("data",mData)
+        const img = new Image();
+        img.src = mData.profileImg;
+        img.onload = () => {
+            setProfilePreloadImg((prevState) => ({...prevState,image:img}) );
+            console.log("image loaded");
+        }
+
+        img.onerror = () => {
+            console.log(error);
+        }
+    }
+
+    const preloadCoverImg = () => {
+        const img = new Image();
+        img.src = mData.mediaUrl;
+        img.onload = () => {
+            setMediaPreloadImg((prevState) => ({...prevState,image:img}) );
+            console.log("image loaded");
+        }
+
+        img.onerror = () => {
+            setMediaPreloadImg((prevState) => ({...prevState,image:profilePreloadImg.image}) );
+
+            console.log("error");
+        }
+    }
+
+    
+
+    const [ profilePreloadImg, setProfilePreloadImg ] = useState({image:''})
+    const [ mediaPreloadImg, setMediaPreloadImg ] = useState({image:''})
+
     const verifiedIconStyle = {fontSize:"1.0em"};
     const menuIconStyle = {fontSize:"2.0em"};
     const imgStyle = {paddingTop:"0%"};
@@ -168,13 +202,22 @@ const PostDetailCard = ({data}) => {
 
     const [donationDonorToggle, setDonationDonorToggle] = useState(false);
 
+    useEffect(()=> {
+    
+        if(mData != null ){
+            
+            preloadImg();
+            preloadCoverImg();
+        }
+
+    },[]);
 
     return (
         <div className=" px-4 border-x-2">
             <div className=" flex flex-row justify-between py-2">
                 <div className=" flex flex-row items-center gap-2 font-bold text-2xl cursor-pointer">
                     <div className=" w-12" style={imgStyle}>
-                        <img className=" w-full h-full" src={proImage()} alt="" />
+                        <img className=" w-full h-full" src={profilePreloadImg.image.src} alt="" />
                     </div>
                     <h5>{proName()}</h5>
                     {proVeried()}
@@ -185,7 +228,7 @@ const PostDetailCard = ({data}) => {
             </div>
             {proCaption()}
             <div className=" flex justify-center bg-[#1E1E1E] mb-2" style={imgStyle}>
-                {proMedia()}
+                <img className=" w-full h-full" src={mediaPreloadImg.image.src} alt="" />
             </div>
             {proMessage()}
             <hr className=" my-2"/>
@@ -258,7 +301,6 @@ const PostDetail = () => {
                         minAmount: mPost.minAmount,
                         caption: mPost.caption,
                         message: mPost.message,  
-                        mediaUrl: mPost.mediaUrls,
                         dateCreated:mPost.dateCreated,
                         
                         firstName: myProfile.userAddress.userName.firstName,
