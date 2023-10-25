@@ -19,11 +19,11 @@ const Faq = () => {
     return (
         <div className="background-gradient w-full min-h-screen grid grid-col-[auto] justify-center">
             
-            <div className="bg-gray-50 flex w-fit md:w-[500px] lg:w-[700px] flex-col text-left items-center  border-2 rounded-lg shadow-md m-4 gap-4 ">
-                <div className=" mt-4 font-bold border-b-2 w-3/4 mx-4 pb-2">
+            <div className="bg-gray-50 flex w-fit md:w-[500px] lg:w-[700px] flex-col text-left items-center border-2 rounded-lg shadow-md mx-4 mb-5 mt-10 gap-4  p-10">
+                <div className="font-bold border-b-2 w-full text-center">
                         <h2>FAQ</h2>
                 </div>
-                <div className="px-20 flex-initial  items-start text-gray-800">
+                <div className=" flex-initial  items-start text-gray-800">
                     <div className={` ${para}`}>
                         <h2 className={` ${header}`}>1. What is the purpose of Affiliation? </h2>
                         <p className=" ms-5">This is an open place and anyone can create an if they need help. but how do you tell, if someone is genuine for those that have not been veried?</p>

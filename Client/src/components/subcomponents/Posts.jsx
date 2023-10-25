@@ -47,7 +47,7 @@ const PostCardView = ({data}) => {
         if(mData.caption!=null && mData.caption != ""){
             cap = mData.caption;
 
-            return <h5 className=" font-semibold">{cap} </h5>
+            return <h5 className="line-clamp-1 text-start font-semibold text-sm md:text-base">{cap} </h5>
         }
         return <div></div>
     }
@@ -58,7 +58,7 @@ const PostCardView = ({data}) => {
         if(mData.message!=null && mData.message != ""){
             msg = mData.message;
 
-            return <p className="truncate  text-sm text-left text-gray-700">{msg} </p>
+            return <p className="line-clamp-3 my-1 text-sm text-left text-gray-700">{msg}</p>
         }
     }
 
@@ -131,13 +131,13 @@ const PostCardView = ({data}) => {
 
     //Setting profile Location
     const proLocation = () => {
-        let location = "";
-        if(mData.location!=null && mData.location != ""){
-            location = mData.location;
+        let country = "";
+        if(mData.country!=null && mData.country != ""){
+            country = mData.country;
 
             return <div className=" flex text-sm gap-2 items-center">
                 <MdLocationPin style={minIconStyle}/>
-                <p className="text-xs">{location} </p>
+                <p className="text-xs">{country} </p>
             </div>
         }
 
@@ -148,12 +148,16 @@ const PostCardView = ({data}) => {
     const proAffiliation = () => {
         let affli = "";
         if(mData.affiliation!=null && mData.affiliation != ""){
-            affli = mData.affiliation;
+            affli = window.tronWeb.address.fromHex(mData.affiliation);
+            console.log("Address aff",affli)
+            if(affli !== 'T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb' && affli !== window.tronWeb.address.fromHex(mData.address) ){
 
-            return <div className=" flex text-sm gap-2 items-center">
-                <MdOutlineDiversity3 className=" " style={minIconStyle}/>
-                <p className="text-xs cursor-pointer ">{window.tronWeb.address.fromHex(affli)}</p>
-            </div>
+            }
+
+                return <div className=" flex text-sm gap-2 items-center">
+                    <MdOutlineDiversity3 className=" " style={minIconStyle}/>
+                    <p className="text-xs cursor-pointer text-clip ">{affli} </p>
+                </div>
         }
 
         return null
@@ -238,8 +242,8 @@ const PostCardView = ({data}) => {
             </div>
             <div className=' grid grid-cols-[auto,auto] justify-start gap-2 w-full'>
             
-                <div className=' w-36 md:me-2 bg-gray-200'>
-                    {<img className=' w-full h-full' src={mediaPreloadImg.image.src} alt="" />}
+                <div className=' min-w-sm max-w-36 md:me-2 '>
+                    {<img className=' w-full md:h-full' src={mediaPreloadImg.image.src} alt="" />}
                 </div>
                 <div className=' grid grid-row[auto]'>
                     <div className = " w-full ow-span-full">
@@ -255,7 +259,7 @@ const PostCardView = ({data}) => {
                     </div>
                     {proMessage()}
                     <hr />
-                    <div className=' flex flex-row items-center  text-xs md:text-xs gap-2 text-gray-500'>
+                    <div className=' flex flex-wrap items-center  text-xs md:text-xs gap-2 text-gray-500'>
                         {proOrg()}
                         {proLocation()}
                         <Link  to={`/${ecodeAddress(window,mData.mAddress)}`} >

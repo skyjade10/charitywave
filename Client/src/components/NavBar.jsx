@@ -190,7 +190,7 @@ const NavBar = () => {
                 <li className={` ${iconClass}`}>{<CgProfile style={iconsStyle} onClick={profileOnclick}/>}</li>
                 <li onClick={()=>{
                     menuToggle?setMenuToggle(false):setMenuToggle(true)
-                    }} className={` ${iconClass}`}>{<MdMenu style={iconsStyle}/>}</li>
+                    }} className={` me-2 ${iconClass}`}>{<MdMenu style={iconsStyle}/>}</li>
             </ul>
 
             <ul className=' md:hidden '>
@@ -228,10 +228,12 @@ const NavBar = () => {
 
 
                     <hr className=' border-gray-400'/>
-                    <div className=" md:hidden flex flex-col gap-2 m-2 ">
-                        <button className="w-5/6 shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4  text-white rounded-full cursor-pointer self-center"
-                        onClick={creatPost}>Donate Post</button>
-                    </div>
+                    {isLoggedIn && (
+                        <div className=" md:hidden flex flex-col gap-2 m-2 ">
+                            <button className="w-5/6 shadow-lg bg-fuchsia-900 pt-2 pb-2 ps-4 pe-4  text-white rounded-full cursor-pointer self-center"
+                            onClick={creatPost}>Donate Post</button>
+                        </div>
+                    )}
                     {<MenuItems icon={<CgProfile style={menuIconsStyle} />} title="My Profile" menuOnClick={profileOnclick}/>}
                     {<MenuItems icon={<MdOutlineListAlt style={menuIconsStyle }/>} title="Post" menuOnClick={()=> navigate('/post')}/>}
                     {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="Pages" menuOnClick={()=> navigate('/pages')}/>}

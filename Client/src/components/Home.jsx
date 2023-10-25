@@ -10,11 +10,11 @@ const Home = ({left,main}) => {
 
     return (
         <div className="">
-            <div className=" grid gap-2 lg:grid-cols-[25%,auto,20%] md:grid-cols-[25%,auto,20%]  item-center px-4 h-full">
+            <div className=" grid gap-2 lg:grid-cols-[25%,auto,20%] md:grid-cols-[25%,auto,20%]  item-center px-2 h-full">
                 <div className=" hidden md:contents">
                     {left}
                 </div>
-                <div className=" relative  px-2  overflow-y">
+                <div className=" relative overflow-y">
                     
                     {main}
                 </div>

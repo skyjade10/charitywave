@@ -156,12 +156,20 @@ const About = () => {
                         <li>False information and features.</li>
                     </ul>
 
-                    <p>The Company reserves the right, but not the obligation, to, in its sole discretion, determine whether or not any Content is appropriate and complies with this Terms, refuse or remove this Content. The Company further reserves the right to make formatting and edits and change the manner of any Content. The Company can also limit or revoke the use of the Service if You post such objectionable Content. As the Company cannot control all content posted by users and/or third parties on the Service, you agree to use the Service at your own risk. You understand that by using the Service You may be exposed to content that You may find offensive, indecent, incorrect or objectionable, and You agree that under no circumstances will the Company be liable in any way for any content, including any errors or omissions in any content, or any loss or damage of any kind incurred as a result of your use of any content.</p>
+                    <p>The Company reserves the right, but not the obligation, to, in its sole discretion, determine whether or not any Content is 
+                        appropriate and complies with this Terms, refuse or remove this Content. The Company further reserves the right to make formatting
+                         and edits and change the manner of any Content. The Company can also limit or revoke the use of the Service if You post such objectionable Content. 
+                         As the Company cannot control all content posted by users and/or third parties on the Service, you agree to use the Service at your own risk. 
+                         You understand that by using the Service You may be exposed to content that You may find offensive, indecent, incorrect or objectionable, and 
+                         You agree that under no circumstances will the Company be liable in any way for any content, including any errors or omissions in any content, 
+                         or any loss or damage of any kind incurred as a result of your use of any content.</p>
+                         
                     <h6 className=" font-bold text-gray-600">Content Backups</h6>
 
                     <p>Although regular backups of Content are performed, the Company does not guarantee there will be no loss or corruption of data.</p>
 
-                    <p>Corrupt or invalid backup points may be caused by, without limitation, Content that is corrupted prior to being backed up or that changes during the time a backup is performed.</p>
+                    <p>Corrupt or invalid backup points may be caused by, without limitation, Content that is corrupted prior to being backed up or that
+                         changes during the time a backup is performed.</p>
 
                     <p>The Company will provide support and attempt to troubleshoot any known or discovered issues that may affect the backups of Content. But You acknowledge that the Company has no liability related to the integrity of Content or the failure to successfully restore Content to a usable state.</p>
 

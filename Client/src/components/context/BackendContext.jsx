@@ -123,18 +123,16 @@ export const BackendProvider = ({children}) => {
 
     useEffect(() => {
 
-        console.log("running use effect backcontec")
-
-        if(JSON.parse(window.localStorage.getItem(VOYTE_USER)) != null){
+        if(JSON.parse(window.localStorage.getItem(VOYTE_USER)) !== null){
             setVoyteUser(JSON.parse(window.localStorage.getItem(VOYTE_USER)));
-            setIsLogged(window.sessionStorage.getItem(IS_LOGGED_IN))
+            setIsLogged(true)
         }
 
-        if(JSON.parse(window.localStorage.getItem(CURRENT_ACCOUNT)) != null){
+        if(JSON.parse(window.localStorage.getItem(CURRENT_ACCOUNT)) !== null){
             
             setCurrentAccount(JSON.parse(window.localStorage.getItem(CURRENT_ACCOUNT)))
         }
-        if(window.localStorage.getItem(TRON_LINK_IS_CONNECTED) != null){
+        if(window.localStorage.getItem(TRON_LINK_IS_CONNECTED) !== null){
 
             setTronLinkConnected(window.localStorage.getItem(TRON_LINK_IS_CONNECTED))
         }

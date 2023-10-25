@@ -92,6 +92,16 @@ const PostDetailCard = ({data}) => {
         return <img className=" w-full h-full" src={proImage()} alt="" />;
     }
 
+    const viewAllText = () => {
+        const mainText = document.getElementById("main-text")
+        if(mainText.classList.contains("line-clamp-4")){
+            mainText.classList.remove('line-clamp-4')
+        }else{
+            mainText.classList.add('line-clamp-4')
+        }
+        
+    }
+
     //Setting Message
     const proMessage = () => {
         let msg = "";
@@ -100,7 +110,7 @@ const PostDetailCard = ({data}) => {
             if(mData.message!=null && mData.message != ""){
                 msg = mData.message;
     
-                return <p className=" text-base text-left">{msg} </p>
+                return <p  id="main-text" className="line-clamp-4 cursor-pointer text-sm  md:text-base text-left" onClick={viewAllText}>{msg}  </p>
             }
         }
     }
@@ -113,7 +123,7 @@ const PostDetailCard = ({data}) => {
             if(mData.caption!=null && mData.caption != ""){
                 cap = mData.caption;
     
-                return <p className=" text-base text-left">{cap} </p>
+                return <p className="line-clamp-4 text-base text-left my-1">{cap} </p>
             }
         }
     }
@@ -213,7 +223,7 @@ const PostDetailCard = ({data}) => {
     },[]);
 
     return (
-        <div className=" px-4 border-x-2">
+        <div className=" px-4 ">
             <div className=" flex flex-row justify-between py-2">
                 <div className=" flex flex-row items-center gap-2 font-bold text-2xl cursor-pointer">
                     <div className=" w-12" style={imgStyle}>
@@ -334,7 +344,7 @@ const PostDetail = () => {
    }, []);
 
     return (
-        <div>
+        <div className=" bg-white mt-4 mb-10 pb-5 rounded-md">
             <PostDetailCard data = {postDetailData}/>
         </div>
     )

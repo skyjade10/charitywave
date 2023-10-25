@@ -295,7 +295,7 @@ const Pages = ({props}) => {
     })
 
     return (
-        <div className=' max-h-screen overflow-y-auto px-2'>
+        <div className=' max-h-screen overflow-y-auto '>
             {profiles}
             <div>
                 { load?  <Loader/> : lastIndex ? <p className=' text-gray-700'>No pages</p> : <button className=' border-b-2 px-6 py-1 animate-pulse text-gray-700' onClick={()=>{setInitIndex(true)}}>more...</button>}

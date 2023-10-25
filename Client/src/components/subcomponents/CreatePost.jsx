@@ -260,23 +260,23 @@ const CreatePost = () => {
                         <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="postimg" onClick={handleFileUpload}>Add Image</button>
                     </div>
                 </div>
-            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-4  w-2/3">
+            <div className="flex flex-col gap-4  w-4/6">
 
                 <div className={` ${divClass}`}>
                     <p className={` ${textClass}`}>Affiliation </p> 
                     <p className=" text-xs text-red-600">{affiliation.message}</p> 
                     <input name="firstname" className={` ${inPutClass} `} onChange={(e)=>{handleAffliation(handleChange(e));}}/>
                 </div>
-                <div className={` ${divClass}`}>
-                    <p className={` ${textClass}`}>Caption</p>
-                    <p className=" text-xs text-red-600">{caption.message}</p>  
-                    <input name="email" className={` ${inPutClass}`} onChange={(e)=>{handleCaption(handleChange(e));}}/>
-                </div>
 
                 <div className={` ${divClass}`}>
                     <p className={` ${textClass}`}>Amount</p>
                     <p className=" text-xs text-red-600">{amount.message}</p>  
                     <input name="amount" type={"number"} className={` ${inPutClass}`} onChange={(e)=>{handleAmount(handleChange(e));}}/>
+                </div>
+                <div className={` ${divClass}`}>
+                    <p className={` ${textClass}`}>Caption</p>
+                    <p className=" text-xs text-red-600">{caption.message}</p>  
+                    <input name="email" className={` ${inPutClass}`} onChange={(e)=>{handleCaption(handleChange(e));}}/>
                 </div>
 
                 
