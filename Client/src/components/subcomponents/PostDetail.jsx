@@ -2,6 +2,8 @@
 import React, { useEffect, useState , useContext} from "react";
 
 import { MdMenu, MdVerified } from "react-icons/md";
+import { CgDanger } from 'react-icons/cg'
+import theme from "../../colors";
 import media from '../../assets/images/cover3.jpg'
 import { useLocation } from "react-router";
 import { useParams } from "react-router";
@@ -12,17 +14,31 @@ import { getDownloadURL,ref } from "firebase/storage";
 import { contractAbi, contractAddress } from "../context/constants";
 import { async } from "@firebase/util";
 import { ClientContext } from "../context/ClientContext";
+import { BackendContext } from "../context/BackendContext";
 
+
+const MenuItems = ({icon,title,menuOnClick}) => {
+    
+    return (
+        <div className={` border-2 hover:bg-gray-200 flex flex-row items-center px-3 py-1 gap-4 text-gray-600 cursor-pointer
+        active:bg-gray-200 border-b-2 border-transparent hover:border-[${theme.purple}]`} onClick={menuOnClick}>
+            {icon}
+            <p>{title}</p>
+        </div>
+    )
+}
+
+const menuIconsStyle = {color:theme.purple, fontSize: "1.5em"}
 
 const PostDetailCard = ({data}) => {
 
     const { setTransactModalOpen,setTransactionData } = useContext(ClientContext)
+    const { voyteUser } = useContext(BackendContext);
     const mData = data[0];
 
     const getId = () => {
         console.log(mData.postId);
         return mData.postId.toNumber();
-        //navigate('/profile');
     }
 
     const donate = (mpostID,mname,maddress) => {
@@ -208,9 +224,31 @@ const PostDetailCard = ({data}) => {
 
     })
 
-    
+    const moreToggle = () => {
+
+        const moreMenu = document.getElementById('more-menu');
+
+        if(moreMenu.classList.contains('hidden')){
+            moreMenu.classList.remove('hidden');
+        }else{
+            moreMenu.classList.add('hidden');
+        }
+    }
+
+    const checkAddress = () => {
+
+        if(mData != null && userAddress !== null){
+            if(mData.address === voyteUser.address){
+                console.log("Check address", mData.address)
+                setOwnPost(true)
+            }
+        }else{
+            setOwnPost(false)
+        }
+    }
 
     const [donationDonorToggle, setDonationDonorToggle] = useState(false);
+    const [ownPost, setOwnPost ] = useState(false);
 
     useEffect(()=> {
     
@@ -219,6 +257,9 @@ const PostDetailCard = ({data}) => {
             preloadImg();
             preloadCoverImg();
         }
+
+        checkAddress();
+        
 
     },[]);
 
@@ -232,8 +273,14 @@ const PostDetailCard = ({data}) => {
                     <h5>{proName()}</h5>
                     {proVeried()}
                 </div>
-                <div className=" cursor-pointer">
-                    <MdMenu style={menuIconStyle}/>
+                <div className=" cursor-pointer" onClick={()=>{console.log("hello world")}}>
+                    <MdMenu style={menuIconStyle} onClick={moreToggle}/>
+                    <div id="more-menu" className=" hidden bg-white border-2 text-sm rounded-md absolute end-4">
+                        <ul>
+                            { ownPost && (<MenuItems icon={<CgDanger style={menuIconsStyle}/>} title="Report" menuOnClick={()=> navigate('/pages')}/> )}
+                            { !ownPost && (<MenuItems icon={<CgDanger style={menuIconsStyle}/>} title="Delete" menuOnClick={()=> navigate('/faq')}/> )}
+                        </ul>
+                    </div>
                 </div>
             </div>
             {proCaption()}

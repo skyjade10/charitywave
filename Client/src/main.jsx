@@ -11,7 +11,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ClientProvider>
       <React.StrictMode>
         <App />
-      </React.StrictMode>,
+      </React.StrictMode>
     </ClientProvider>
   </BackendProvider>
 )

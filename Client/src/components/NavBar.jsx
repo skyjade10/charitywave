@@ -1,14 +1,15 @@
 import React, {useState} from 'react'
 import logo from '../assets/images/logoc.png'
 import { CgProfile,CgSearch } from 'react-icons/cg'
-import { MdMenu,MdOutlineListAlt,MdInfoOutline  } from 'react-icons/md'
+import { MdMenu,MdOutlineListAlt,MdInfoOutline,MdHelpOutline  } from 'react-icons/md'
+import { RiPagesLine } from 'react-icons/ri'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router-dom'
 import theme from '../colors';
 import { useContext } from 'react'
 import { BackendContext } from './context/BackendContext'
 import { ClientContext } from './context/ClientContext'
-import { urlpath } from '../utils'
+import { ecodeAddress } from '../utils'
 
 import { CURRENT_ACCOUNT,TRON_LINK_IS_CONNECTED,IS_LOGGED_IN,VOYTE_USER } from './context/stateconstants'
 
@@ -62,7 +63,7 @@ const NavBar = () => {
         if(tronLinkConnected){
            if(currentAccount.base58 != null || currentAccount.base58 != ''){
              if(isLoggedIn){
-                navigate(`/${urlpath}`, { state: voyteUser.address });
+                navigate(`/${ecodeAddress(window,voyteUser.address)}`);
                 setMenuToggle(false)
              }else{
                 //navigate('/login');
@@ -73,16 +74,8 @@ const NavBar = () => {
            }
            
         }else{
-
-            if(connectWallet()){
-                setSignInModalIsOpen(true);
-                setMenuToggle(false);
-                return
-            }else{
-                setMenuToggle(false)
-                return alert("TronLink not connected");
-            }
-
+            setMenuToggle(false)
+            return alert("TronLink not connected");
             
         }
     }
@@ -236,8 +229,8 @@ const NavBar = () => {
                     )}
                     {<MenuItems icon={<CgProfile style={menuIconsStyle} />} title="My Profile" menuOnClick={profileOnclick}/>}
                     {<MenuItems icon={<MdOutlineListAlt style={menuIconsStyle }/>} title="Post" menuOnClick={()=> navigate('/post')}/>}
-                    {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="Pages" menuOnClick={()=> navigate('/pages')}/>}
-                    {<MenuItems icon={<CgProfile style={menuIconsStyle}/>} title="FAQ" menuOnClick={()=> navigate('/faq')}/>}
+                    {<MenuItems icon={<RiPagesLine style={menuIconsStyle}/>} title="Pages" menuOnClick={()=> navigate('/pages')}/>}
+                    {<MenuItems icon={<MdHelpOutline style={menuIconsStyle}/>} title="FAQ" menuOnClick={()=> navigate('/faq')}/>}
                     {<MenuItems icon={<MdInfoOutline style={menuIconsStyle}/>} title="About" menuOnClick={()=> navigate('/about')}/>}
                     
                     {isLoggedIn && (

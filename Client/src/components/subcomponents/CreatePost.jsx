@@ -10,28 +10,17 @@ import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { randomPostId, urlpath } from "../../utils";
 
-import ShortUniqueId from 'short-unique-id';
+import ShortUniqueId, { DEFAULT_UUID_LENGTH } from 'short-unique-id';
 
 import { contractAddress, contractAbi } from '../../components/context/constants';
 
+import { Loader } from '../../components'
+
+
+
+
 const CreatePost = () => {
 
-    // const { profileData, setProfileData } = useState(
-    //     {
-    //         firstName: "Zambwe",
-    //         lastName: "Nasilele",
-    //         email:" World health Org",
-    //         contact:"09722893465",
-    //         website: "www.zana.com",
-    //         homeAddress: "2516 Zamclay",
-    //         profileType: "Individual",
-    //         location: "Kalulushi, Zambia", 
-    //         profileImg: "",
-    //         coverImg: "",
-    //         bio: "Lm ipsuissimos consectetur ea nulla minima."
-    
-    //     }
-    // );
 
     //checks if the affliation meet the requirements i.e length
     const handleAffliation = (mData) => {
@@ -94,12 +83,33 @@ const CreatePost = () => {
 
     const onPostFileChange = (e) => {
 
-        console.log(e.target.name);
+        const fileInfo = document.getElementById('file-error')
+        const imageContainer = document.getElementById('postimage')
+        const inputTag = e.target;
+        var reader = new FileReader();
 
-        let proUrl = "postimg/"+ urlpath+ "/" + postid;
-        setPostImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:proUrl}));
+        let proUrl = "postimg/"+ urlpath(window)+ "/" + postid;
+        let file = e.target.files[0];
+        if(file.type === 'image/png' || file.type === 'image/jpeg' ){
+            if(file.size < 5500000){
+                if(!fileInfo.classList.contains('hidden')){
+                    fileInfo.classList.add('hidden')
+                }
 
-        console.log("Url ",postImgState.fileUrl," Selected file", postImgState.selectedFile);
+                setPostImgState((prevState) => ({...prevState, selectedFile: file,fileUrl:proUrl}));
+                reader.onload = function () {
+                    imageContainer.src = reader.result;
+                }
+
+                reader.readAsDataURL(inputTag.files[0])
+            }else{
+                fileInfo.classList.remove('hidden')
+                fileInfo.innerText = "Image too big"
+            }
+        }else{
+            fileInfo.classList.remove('hidden')
+            fileInfo.innerText = "Supports images only"
+        }
         
     }
 
@@ -118,6 +128,7 @@ const CreatePost = () => {
 
 
     const [ postImgState,setPostImgState ] = useState({selectedFile: null,fileUrl:''});
+    const [ loading, setLoading ] = useState(false)
 
 
     const handleFileUpload  = async (e) => {
@@ -127,23 +138,20 @@ const CreatePost = () => {
             console.log(e.target.value);
             
             if(postImgState.selectedFile != null){
+
+                setLoading(true);
                 let imageRef = ref(storage, `${postImgState.fileUrl}`);
+
                 var upload = await uploadBytes(imageRef,postImgState.selectedFile);
-                console.log(" Profile Image Uploaded",upload);
-
-                let getUrl = await getDownloadURL(upload.ref)
-                console.log(" Profile Image downloaded",getUrl);
-
-                //Show the uploaded image
-                var setImage ='';
-                if( getUrl != '' && getUrl != null){
-
-                    setImage = document.getElementById("postimage");
-                    setImage.src = `${getUrl}`;
-                }else{
-
-                    setImage.src = cover;
-                }
+                
+                if (upload) {
+                    console.log("upload true",postImgState.selectedFile)
+                    return true
+                 }else{
+                    console.log("upload false")
+                    setLoading(false)
+                    return false
+                 }
               
             }
             
@@ -177,37 +185,37 @@ const CreatePost = () => {
 
         const  trW = window.tronWeb;
 
-       // const mBio = bio.value //string
-        //const mCountry = country
-
         if(isLoggedIn){
             console.log("add islogged")
             if(tronLinkConnected){
                 console.log("add tron")
                 try {
             
-                    
-                    
                     const instance = await window.tronWeb.contract(contractAbi,contractAddress);
                     console.log("My address ", affiliation.value)
-                    const createPost = await instance.addPost(
-                        postid,voyteUser.address,voyteUser.password,getAff(),amount.value,caption.value,bio.value,postImgState.fileUrl
-                    ).send({
-                        feeLimit:400_000_000,
-                        callValue:0,
-                        shouldPollResponse:true
-                      });
-        
-                      if(createPost.success){
-                        console.log(createPost);
-                        
-                      }
+                    if(handleFileUpload()){
 
-                      console.log(createPost);
-                      alert("post created")
+                        const createPost = await instance.addPost(
+                            postid,voyteUser.address,voyteUser.password,getAff(),amount.value,caption.value,bio.value,postImgState.fileUrl
+                        ).send({
+                            feeLimit:400_000_000,
+                            callValue:0,
+                            shouldPollResponse:true
+                          });
+            
+                          if(createPost.success){
+                            console.log(createPost);
+                            setLoading(false)
+                            
+                          }
+    
+                          console.log(createPost);
+                          alert("post created")
+                    }
 
                 } catch (error) {
                     console.log(error);
+                    setLoading(false)
                 }
             }
         }
@@ -246,21 +254,27 @@ const CreatePost = () => {
     const textClass = " font-bold text-sm mt-2";
     const divClass = " flex flex-col justify-center items-start ";
     return (
-        <div className=" bg-gray-50 flex flex-col justify-center items-center border-2 rounded-lg shadow-md m-4 gap-4 ">
-            <div className=" mt-4 font-bold border-b-2 w-3/4 mx-4 pb-2">
-                <h2>Creating Post</h2>
-            </div>
-            <div className="w-full flex flex-col justify-center items-center  m-1 text-sm text-gray-900 px-20">
-                    <p className=" text-md text-bold "></p>
-                    <div className=' w-36 md:me-2 m-1'>
-                        <img className=' w-full h-[150px]' src={cover} alt="profile-pic" id="postimage" />
+        <div className=" bg-gray-50 flex flex-col justify-center items-center border-2 rounded-lg shadow-md m-4 px-5 gap-4 ">
+            <div className="w-full flex flex-col justify-center items-center  m-1 text-sm text-gray-900 px-2 sm:px-10 md:px-15 lg:px-20">
+                {loading && (
+                    <div className=" absolute z-20 top-1/2 backdrop-blur-sm w-26">
+                        <Loader />
                     </div>
-                    <div className="flex flex-col gap-1 justify-center items-center lg:flex-row lg:justify-between lg:items-center text-xs mt-2">
-                        <input type={'file'} name="profileimg" onChange={onPostFileChange}/>
-                        <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="postimg" onClick={handleFileUpload}>Add Image</button>
+                )}
+            <div className=" mt-4 font-bold border-b-2 w-full  pb-2">
+                <h2>Create Post</h2>
+            </div>
+                    <p className=" text-md text-bold "></p>
+                    <div className=' h-36 my-3 md:me-2 m-1'>
+                        <img className=' w-full h-[150px] bg-slate-500 shadow-md border-2 shadow-gray-400' src={cover} alt="" id="postimage" />
+                    </div>
+                    
+                    <p className="hidden text-xs text-red-600 " id='file-error'></p> 
+                    <div className="flex flex-col gap-1 justify-center items-center text-xs mt-2">
+                        <input id="file-input" type={'file'} accept=".jpg,.jpeg,.png,.PNG" name="profileimg" onChange={onPostFileChange}/>
                     </div>
                 </div>
-            <div className="flex flex-col gap-4  w-4/6">
+            <div className="flex flex-col gap-4 w-full sm:w-3/4 md:w-3/4 lg:w-3/4">
 
                 <div className={` ${divClass}`}>
                     <p className={` ${textClass}`}>Affiliation </p> 
@@ -282,14 +296,14 @@ const CreatePost = () => {
                 
             </div>
 
-            <div className="  flex flex-col items-center m-4 w-4/6">
+            <div className="  flex flex-col items-center w-full sm:w-3/4 md:w-3/4 lg:w-3/4">
                 <p className={` ${textClass}`}>Bio:</p> 
                 <p className=" text-xs text-red-600">{bio.message}</p> 
                 <textarea className={` ${inPutClass} w-1/3 h-[150px] rounded-md text-sm`} onChange={(e)=>{handleBio(handleChange(e));}}/>
             </div>
 
             <div className=" flex justify-end p-5 w-4/6">
-                <b className=" bg-purple-900 py-1 px-6 rounded-s-full rounded-e-full cursor-pointer text-white font-normal hover:bg-purple-800 " onClick={handleSubmit}>Post</b>
+                <b className= {`bg-purple-900 py-1  px-6 rounded-s-full rounded-e-full cursor-pointer text-white font-normal ${loading? 'disable': ''} hover:bg-purple-800`} onClick={handleSubmit}>Post</b>
             </div>
 
         </div>

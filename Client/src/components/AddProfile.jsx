@@ -7,6 +7,7 @@ import { MdKeyboardArrowDown } from 'react-icons/md'
 
 import { storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Loader } from '../components'
 
 import { contractAddress, contractAbi } from '../components/context/constants';
 import {  urlpath  } from "../utils";
@@ -161,80 +162,120 @@ const AddProfile = () => {
 
     const onProfileFileChange = (e) => {
 
-        console.log(e.target.name);
+        const fileInfo = document.getElementById('profileimage-error')
+        const imageContainer = document.getElementById('profileimage')
+        const inputTag = e.target;
+        var reader = new FileReader();
 
         let proUrl = "profileImg/" + urlpath;
-        setProImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:proUrl}));
+        let file = e.target.files[0];
+        if(file.type === 'image/png' || file.type === 'image/jpeg' ){
+            if(file.size < 5500000){
+                if(!fileInfo.classList.contains('hidden')){
+                    fileInfo.classList.add('hidden')
+                }
 
-        console.log("Url ",proImgState.fileUrl," Selected file", proImgState.selectedFile);
+                setProImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:proUrl}));
+                reader.onload = function () {
+                    imageContainer.src = reader.result;
+                }
+
+                reader.readAsDataURL(inputTag.files[0])
+            }else{
+                fileInfo.classList.remove('hidden')
+                fileInfo.innerText = "Image too big"
+            }
+        }else{
+            fileInfo.classList.remove('hidden')
+            fileInfo.innerText = "Supports images only"
+        }
         
     }
 
 
     const onCoverFileChange = (e) => {
 
-        console.log(e.target.name);
+        const fileInfo = document.getElementById('coverimage-error')
+        const imageContainer = document.getElementById('coverimage')
+        const inputTag = e.target;
+        var reader = new FileReader();
         
         let covUrl = "coverImg/" + urlpath;
-        setCoverImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:covUrl}));
+        let file = e.target.files[0];
+        if(file.type === 'image/png' || file.type === 'image/jpeg' ){
+            if(file.size < 5500000){
+                if(!fileInfo.classList.contains('hidden')){
+                    fileInfo.classList.add('hidden')
+                }
 
-        console.log("Url ",coverImgState.fileUrl," Selected file", coverImgState.selectedFile);
-       
+                setCoverImgState((prevState) => ({...prevState, selectedFile: e.target.files[0],fileUrl:covUrl}));
+                reader.onload = function () {
+                    imageContainer.src = reader.result;
+                }
+
+                reader.readAsDataURL(inputTag.files[0])
+            }else{
+                fileInfo.classList.remove('hidden')
+                fileInfo.innerText = "Image too big"
+            }
+        }else{
+            fileInfo.classList.remove('hidden')
+            fileInfo.innerText = "Supports images only"
+        }
+        
     }
 
+    const [loadingInfo, setLoadingInfo] = useState('');
     const handleFileUpload  = async (e) => {
  
         try {
 
-            console.log(e.target.value);
+            if(e.target.name === 'profileimg'){
+
+                if(proImgState.selectedFile != null){
+
+                    setSignUpLoader(true)
+                    setLoadingInfo('Uploading profile image please wait...')
+                    let imageRef = ref(storage, `${proImgState.fileUrl}`);
+                    var upload = await uploadBytes(imageRef,proImgState.selectedFile);
+
+                    if(upload){
+                        setLoadingInfo('Profile image uploaded')
+                        setTimeout(() => {
+                            setSignUpLoader(false)
+                        }, 3000);
+                    }
+                    
+                  
+                }
+            }
             
-            if(proImgState.selectedFile != null){
-                let imageRef = ref(storage, `${proImgState.fileUrl}`);
-                var upload = await uploadBytes(imageRef,proImgState.selectedFile);
-                console.log(" Profile Image Uploaded",upload);
+            if(e.target.name === 'coverimg'){
 
-                let getUrl = await getDownloadURL(upload.ref)
-                console.log(" Profile Image downloaded",getUrl);
+                if(coverImgState.selectedFile != null){
+                    setSignUpLoader(true)
+                    setLoadingInfo('Uploading cover image please wait...')
+                    let imageRefc = ref(storage, `${coverImgState.fileUrl}`);
+                    var uploadn = await uploadBytes(imageRefc,coverImgState.selectedFile);
+                    
 
-                //Show the uploaded image
-                var setImage ='';
-                if( getUrl != '' && getUrl != null){
-
-                    setImage = document.getElementById("profileimage");
-                    setImage.src = `${getUrl}`;
-                }else{
-
-                    setImage.src = cover;
+                    if(uploadn){
+                        setLoadingInfo('Profile image uploaded')
+                        setTimeout(() => {
+                            setSignUpLoader(false)
+                        }, 3000);
+                    }
+    
                 }
-              
             }
-            // if(e.target.name == 'profileimg'){
 
-            // }
-            if(proImgState.selectedFile != null){
-                let imageRefc = ref(storage, `${coverImgState.fileUrl}`);
-                var uploadn = await uploadBytes(imageRefc,coverImgState.selectedFile);
-                console.log(" Cover Image Uploaded",uploadn);
-
-                let getUrl = await getDownloadURL(uploadn.ref);
-                console.log(" Cover Image downloaded",getUrl);
-
-                //Show the uploaded image
-                var setImage = '';
-                if( getUrl != '' && getUrl != null){
-                    setImage = document.getElementById("coverimage");
-                    setImage.src = `${getUrl}`;
-                }else{
-
-                    setImage.src = cover;
-                }
-
-            }
-            // if(e.target.name == 'coverimg'){
-
-            // }
         } catch (error) {
-            console.log(error)
+            console.log('',error.message)
+            setLoadingInfo('Something went, please check your connection')
+            setTimeout(() => {
+                setSignUpLoader(false)
+            }, 3000);
+            
         }
         
     };
@@ -243,6 +284,8 @@ const AddProfile = () => {
     const { tronLinkConnected,isLoggedIn,voyteUser,setVoyteUser,setIsLogged } = useContext(BackendContext);
     const { validateEmail,checkPassword,requiredTextLength,handleChange,setMnemonicModalOpen} = useContext(ClientContext);
     const [ signUpLoader, setSignUpLoader] = useState(false);
+
+    
 
     const  [firstName, setFirstName]= useState({value:null,message:'', isValid:true});
     const  [lastName, setLastName] = useState({value:null,message:"",isValid:true});
@@ -254,6 +297,7 @@ const AddProfile = () => {
     const  [country, setCountry] = useState({value:null,message:"",isValid:true});
     const  [city, setCity] = useState({value:null,message:"",isValid:true});
     const  [bio, setBio] = useState({value:null,message:"",isValid:true});
+
 
     const navigate = useNavigate();
 
@@ -330,13 +374,13 @@ const AddProfile = () => {
         e.preventDefault()
         
 
-        const mValue = e.target.innerText.toLowerCase().trim();
+        const mValue = e.target.innerText.trim();
 
         console.log(mValue);
 
         if(mValue !== ''){
 
-            if(mValue == "organisation" || mValue == "individual" || mValue == "group"){
+            if(mValue == "Organisation" || mValue == "Individual" || mValue == "Group"){
 
                 const selectedMenuItem = document.getElementById("menu-item-selected");
                 selectedMenuItem.innerText = mValue;
@@ -373,55 +417,52 @@ const AddProfile = () => {
         
     }
 
-    const Loader = (classProps) => {
-        return (
-            <div className=" flex justify-center items-center py-3">
-                <div className={` animate-spin rounded-full h-10 w-10  ${classProps} border-b-4 border-purple-500`}/>
-            </div>
-        )
-    }
 
     const inPutClass = " border-2 w-full outline-none p-2 text-sm text-gray-900 border-gray-300 bg-gray-50 rounded-md hover:border-purple-500 focus:border-purple-800";
-    const textClass = " font-bold text-sm mt-2";
-    const divClass = " flex flex-col justify-center items-start ";
+    const textClass = "ps-2 font-bold text-sm mt-2";
+    const divClass = " flex flex-col justify-center items-start mx-5 w-full md:w-5/12";
     return (
         <div className="background-gradient w-full grid grid-cols-[auto] justify-center ">
-            <div className="bg-gray-50 flex w-[700px] flex-col justify-center items-center border-2 rounded-lg shadow-md m-4 gap-4 ">
+            <div className="bg-gray-50 flex flex-col justify-center items-center  w-fit sm:w-[500px] md:w-[600px] lg:w-[700px] border-2 rounded-lg shadow-md m-4 gap-4 ">
                 <div className=" mt-4 font-bold border-b-2 w-3/4 mx-4 pb-2">
-                    <h2>Creating Profile</h2>
+                    <h2 >Create Profile</h2>
                 </div>
-                <div className=" grid grid-cols-2 gap-4  w-2/3">
-                    <div className=" m-1 text-sm text-gray-900">
-                        <p className=" text-md text-bold ">Cover Image</p>
-                        <div className=' w-36 md:me-2 m-1'>
-                            <img className=' w-full max-h-[150px] aspect-auto' src={cover} alt="cover-pic" id="coverimage" />
+                <div className=" w-full px-10">
+                    { signUpLoader && (<div className=' flex flex-col justify-center items-center z-20 fixed  backdrop-blur-sm h-screen
+                    max-w-[500px] w-5/6 sm:w-[700px] lg:w-[700px] gap-4' id='signUpLoader'>
+                        <p id="loadinginfo">{loadingInfo}</p>
+                        <Loader/>
+                        <button className=" hover:bg-purple-400 rounded-md px-4 py-1 bg-purple-600 text-white cursor-pointer" onClick={()=>setSignUpLoader(false)}>cancel</button>
+                        </div>)}
+                    <div className=" w-auto m-1 text-sm text-gray-900">
+                        <p className=" text-md font-semibold ">Cover Image</p>
+                        <div className=' w-full  md:me-2 m-1 bg-[#F2F5F7] border-2 border-dotted flex flex-col justify-center items-center'>
+                            <img className=' max-h-[200px] aspect-auto' src={cover} alt="" id="coverimage" />
                         </div>
-                        <div className="flex flex-row justify-between items-center text-xs mt-2">
+                        <p className="hidden text-xs text-red-600 " id='coverimage-error'></p> 
+                        <div className="flex flex-row justify-between items-center text-xs mt-2 px-5">
                             <input type={'file'} name="coverimg" onChange={onCoverFileChange}/>
                             { <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm"  name="coverimg" onClick={handleFileUpload}>Upload</button> }
                         </div>
                     </div>
-                    { signUpLoader && (<div className=' flex flex-col justify-center items-center z-20 fixed  backdrop-blur-sm h-screen
-                    max-w-[500px] w-5/6 sm:w-[700px] lg:w-[700px] gap-4' id='signUpLoader'>
-                        <p>Please wait this may take a while</p>
-                        <Loader/>
-                        <button className=" hover:bg-purple-400 rounded-md px-4 py-1 bg-purple-600 text-white cursor-pointer" onClick={()=>setSignUpLoader(false)}>cancel</button>
-                        </div>)}
 
-                    <div className="  m-1 text-sm text-gray-900">
-                        <p className=" text-md text-bold ">Profile Image</p>
-                        <div className=' w-36 md:me-2 m-1'>
-                            <img className=' w-full max-h-[150px]' src={cover} alt="profile-pic" id="profileimage" />
+                    <div className=" flex flex-col items-center justify-center m-1 text-sm text-gray-900">
+                        <p className=" text-md font-semibold ">Profile Image</p>
+                        <div className=' w-auto md:me-2 m-1 bg-[#F2F5F7] border-2 border-dotted '>
+                            <img className=' w-[150px] h-[150px]' src={cover} alt="" id="profileimage" />
                         </div>
+                        <p className="hidden text-xs text-red-600 " id='profileimage-error'></p> 
                         <div className="flex flex-row justify-between items-center text-xs mt-2">
                             <input type={'file'} name="profileimg" onChange={onProfileFileChange}/>
                             { <button className=" px-2 py-[2px] border-[1px] bg-[#EFEFEF] border-[#767676] rounded-sm" name="profileimg" onClick={handleFileUpload}>Upload</button> }
                         </div>
                     </div>
+                </div>
+                <div className=" flex flex-wrap gap-2 justify-center w-full">
                     <div className={` ${divClass}`}>
                         <p className={` ${textClass}`}>First Name </p> 
                         <p className=" text-xs text-red-600">{firstName.message}</p> 
-                        <input name="firstname" className={` ${inPutClass} `} onChange={(e)=>{handleFirstName(handleChange(e));}}/>
+                        <input name="firstname" className={` ${inPutClass} `} onChange={(e)=>{handleFirstName(handleChange(e))}}/>
                     </div>
 
                     <div className={` ${divClass}`}>
@@ -466,34 +507,33 @@ const AddProfile = () => {
                         <input name="city" className={` ${inPutClass}`} onChange={(e)=>{handleCity(handleChange(e));}}/>
                     </div>
 
-                    <div className={` relative inline-block text-left`} >
-    
-                        <p className={` ${textClass}`}>Type</p>
-                        <div className=" flex flex-row justify-between items-center cursor-pointer px-2 py-2 border-[2px] h-10 bg-slate-50 border-gray-300 hover:bg-gray-200 rounded-md " onClick={menuTypeItemToggle}>
-                            <p  className="text-gray-900  text-sm "  id="menu-item-selected"></p>
-                            <MdKeyboardArrowDown style={{fontSize:"1.8em"}}/> 
-                        </div>
-            
-                        <div className=" absolute border rounded-md bg-white right-0  shadow-lg ring-1 ring-black ring-opacity-5 mt-2 " id="menu-item-container">
-                            <div className=" cursor-pointer " role="none">
-
-                                <p  className="text-gray-900 block px-4 py-2 text-sm hover:bg-gray-200" role="menuitem"  id="menu-item-0" value ="individual" onClick={menuTypeItemSelect}>Individual</p>
-                                <p  className="text-gray-900 block px-4 py-2 text-sm  hover:bg-gray-200" role="menuitem"  id="menu-item-1" value ="group" onClick={menuTypeItemSelect}>Group</p>
-                                <p  className="text-gray-900 block px-4 py-2 text-sm  hover:bg-gray-200" role="menuitem"  id="menu-item-2" value ="organisation" onClick={menuTypeItemSelect}>Organisation</p>
-                                {/* <input name="type" className={` ${inPutClass}`} /> */}
-                            </div>
-                        </div>
-                    </div>
                     
                 </div>
+                <div className={` relative inline-block px-5 md:px-7 text-left w-full md:w-6/12 justify-items-start self-start`} >
 
-                <div className="  flex flex-col items-center m-4 w-4/6">
-                    <p className={` ${textClass}`}>Bio:</p> 
-                    <p className=" text-xs text-red-600">{bio.message}</p> 
-                    <textarea className={` ${inPutClass} w-1/3 h-[250px] rounded-md text-sm`} onChange={(e)=>{handleBio(handleChange(e));}}/>
+                    <p className={` ${textClass}`}>Type</p>
+
+                    <div className=" flex flex-row justify-between items-center cursor-pointer px-2 py-2 border-[2px] h-10 bg-slate-50 border-gray-300 hover:bg-gray-200 rounded-md " onClick={menuTypeItemToggle}>
+                        <p  className="text-gray-900  text-sm "  id="menu-item-selected"></p>
+                        <MdKeyboardArrowDown style={{fontSize:"1.8em"}}/> 
+                    </div>
+        
+                    <div className=" hidden absolute border rounded-md bg-white right-8  shadow-lg ring-1 ring-black ring-opacity-5 mt-2 " id="menu-item-container">
+                        <div className=" cursor-pointer " role="none">
+                            <p  className="text-gray-900 block px-4 py-2 text-sm hover:bg-gray-200" role="menuitem"  id="menu-item-0" value ="Individual" onClick={menuTypeItemSelect}>Individual</p>
+                            <p  className="text-gray-900 block px-4 py-2 text-sm  hover:bg-gray-200" role="menuitem"  id="menu-item-1" value ="Group" onClick={menuTypeItemSelect}>Group</p>
+                            <p  className="text-gray-900 block px-4 py-2 text-sm  hover:bg-gray-200" role="menuitem"  id="menu-item-2" value ="Organisation" onClick={menuTypeItemSelect}>Organisation</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div className=" flex justify-end p-5 w-4/6">
+                <div className="  flex flex-col items-center px-8 w-full">
+                    <p className={` ${textClass}`}>Bio:</p> 
+                    <p className=" text-xs text-red-600">{bio.message}</p> 
+                    <textarea id="text-area" className={` ${inPutClass} h-[250px] rounded-md text-sm`} onChange={(e)=>{handleBio(handleChange(e));}}/>
+                </div>
+
+                <div className=" flex justify-end px-8 py-5 w-full">
                     <b className=" bg-purple-900 py-1 px-6 rounded-s-full rounded-e-full cursor-pointer text-white font-normal hover:bg-purple-800 " onClick={handleSubmit}>Save</b>
                 </div>
 

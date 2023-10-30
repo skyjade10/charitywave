@@ -5,7 +5,7 @@ import { BackendContext } from '../context/BackendContext';
 import { ClientContext } from '../context/ClientContext';
 
 
-import {MdVerified, MdMenu,MdOutlineDiversity3,MdLocationPin, MdLocationOn,MdMan4,MdLocationCity,MdGroups2} from "react-icons/md";
+import {MdVerified, MdMenu,MdOutlineDiversity3,MdLocationPin, MdLocationOn,MdMan4,MdLocationCity,MdGroups2, MdFmdGood} from "react-icons/md";
 
 import { contractAddress , contractAbi } from '../context/constants';
 import { urlpath, ecodeAddress } from '../../utils';
@@ -242,8 +242,8 @@ const PostCardView = ({data}) => {
             </div>
             <div className=' grid grid-cols-[auto,auto] justify-start gap-2 w-full'>
             
-                <div className=' min-w-sm max-w-36 md:me-2 '>
-                    {<img className=' w-full md:h-full' src={mediaPreloadImg.image.src} alt="" />}
+                <div className=' sm:w-20 md:w-36 lg:w-36 md:me-2 '>
+                    {<img className=' w-full md:h-full lg:h-full' src={mediaPreloadImg.image.src} alt="" />}
                 </div>
                 <div className=' grid grid-row[auto]'>
                     <div className = " w-full ow-span-full">
@@ -334,6 +334,9 @@ const Posts = ({props}) => {
                         setLastIndex(false)
     
                         const mPosts = await instance.getUserPost(num).call();
+                        if(myTronweb.address.fromHex(mPosts.mAddress) === "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"){
+                            continue;
+                        }
                         const myProfile = await instance.getProfile(myTronweb.address.fromHex(mPosts.mAddress)).call();
                         const profileUrl = await getDownloadURL(ref(storage,"profileImg/"+urlpath(window)));
                        

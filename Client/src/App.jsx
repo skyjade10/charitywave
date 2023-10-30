@@ -21,7 +21,7 @@ function App() {
           <NavBar/>
         </div>
         <div className=' h-[50px] '/>
-        <div className=''>
+        <div >
           {signInModalIsOpen && (<SignInModal/>)}
           {signUpModalIsOpen && (<SignUpModal/>)}
           {mnemonicModalOpen && (<MnemonicModal data = {miscData}/>)}

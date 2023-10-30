@@ -4,7 +4,7 @@ import user from "../assets/images/cover3.jpg"
 import {MdArrowBack, MdVerified,MdMenu,MdMyLocation,MdPhone,MdEmail } from "react-icons/md";
 import { CgWebsite } from 'react-icons/cg';
 import { useState,useEffect,useContext } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useParams  } from "react-router-dom";
 import {  } from "react";
 
@@ -290,6 +290,7 @@ const Profile = () => {
 
     const [loading,setLoading ] = useState(false);
     const myTronweb = window.tronWeb;
+    const navigate = useNavigate();
     useEffect(() => {
         
         (async () => {
@@ -340,8 +341,8 @@ const Profile = () => {
                 console.log("my data", mmData);
                
             } catch (error) {
-                alert('something went wrong')
-                
+                alert('something went wrong, try again')
+                navigate(-1)
                 console.log(error);
             }
             

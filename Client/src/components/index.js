@@ -20,6 +20,7 @@ export { default as Posts } from '../components/subcomponents/Posts';
 export { default as PostDetail } from '../components/subcomponents/PostDetail';
 export { default as CreatePost } from '../components/subcomponents/CreatePost';
 export { default as MinAbout } from '../components/subcomponents/MinAbout'
+export { default as Loader } from '../components/subcomponents/Loader'
 
 //Modals 
 export { default as SignInModal } from '../components/modals/SignInModal';

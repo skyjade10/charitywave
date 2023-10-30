@@ -96,6 +96,22 @@ export const BackendProvider = ({children}) => {
 
     ///Contract methods
 
+    const deletePost = async () => {
+
+    }
+
+    const editPost = async () => {
+
+    }
+
+    const reportPost = () => {
+
+    }
+
+    const reportPage = () => {
+        
+    }
+
     const getPosts = async () => {
         try {
             const contract = getVoyteContract;
